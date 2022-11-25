@@ -35,7 +35,7 @@ let CovorcController = class CovorcController {
             return JSON.stringify(yield Covorc.findAll());
         });
     }
-    createUser(covorc) {
+    createCovorc(covorc) {
         return __awaiter(this, void 0, void 0, function* () {
             Covorc.create(covorc);
         });
@@ -63,7 +63,7 @@ __decorate([
     HttpCode(200),
     OnUndefined(500),
     __param(0, Body())
-], CovorcController.prototype, "createUser", null);
+], CovorcController.prototype, "createCovorc", null);
 __decorate([
     Delete('/covorcs/:id'),
     __param(0, Param('id'))

@@ -15,6 +15,9 @@ Covorc.init({
     description: {
         type: DataTypes.STRING,
     },
+    shortDescription: {
+        type: DataTypes.STRING,
+    },
     address: {
         type: DataTypes.STRING,
         allowNull: false,

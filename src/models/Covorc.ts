@@ -6,6 +6,7 @@ export class Covorc extends Model<InferAttributes<Covorc>, InferCreationAttribut
     declare id: CreationOptional<number>;
     declare title: string;
     declare description: string;
+    declare shortDescription: string;
     declare address: string;
     declare contacts: string;
     declare ownerId: ForeignKey<User['id']>;
@@ -17,7 +18,6 @@ export class Covorc extends Model<InferAttributes<Covorc>, InferCreationAttribut
     // updatedAt can be undefined during creation
     declare updatedAt: CreationOptional<Date>;
 }
-
 
 Covorc.init(
     {
@@ -31,6 +31,9 @@ Covorc.init(
             allowNull: false,
         },
         description: {
+            type: DataTypes.STRING,
+        },
+        shortDescription: {
             type: DataTypes.STRING,
         },
         address: {
