@@ -13,6 +13,9 @@ import {
 import 'reflect-metadata'
 import log4js from "log4js";
 import {CovorcSection} from "../models/CovorcSection.js";
+import {Covorc} from "../models/Covorc.js";
+import {Facilities} from "../models/Facilities.js";
+import {CovorcSectionType} from "../models/CovorcSectionType.js";
 
 const logger = log4js.getLogger()
 
@@ -31,7 +34,7 @@ export class CovorcSectionController {
     @HttpCode(200)
     async getAll() {
         logger.debug(`get all covorc_sections`);
-        return JSON.stringify(await CovorcSection.findAll());
+        return JSON.stringify(await CovorcSection.findAll({include: [Covorc, Facilities, CovorcSectionType]}));
     }
 
     @Post('/covorc_sections')

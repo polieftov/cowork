@@ -28,7 +28,7 @@ export class CovorcController {
     @Get('/covorcs')
     async getAll() {
         logger.debug(`get all covorcs`);
-        return JSON.stringify(await Covorc.findAll());
+        return JSON.stringify(await this.getCovorcs());
     }
 
     @Post('/covorcs')
@@ -47,4 +47,22 @@ export class CovorcController {
         });
         logger.debug(`Covorc with id = ${id} was deleted`);
     }
+
+    async getCovorcs() {
+        return await Covorc.findAll().then(x => {
+                return x.map(covorc => {
+                    return {
+                        id: covorc.id,
+                        title: covorc.title,
+                        shortDesc: covorc.shortDescription,
+                        schedule: covorc.schedule,
+                        maxPrice: covorc.getMaxPrice(),
+                        minPrice: covorc.getMinPrice(),
+                        address: covorc.address
+                    }
+                })
+            }
+        )
+    }
+
 }

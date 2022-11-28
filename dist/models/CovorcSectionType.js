@@ -18,4 +18,15 @@ CovorcSectionType.init({
     sequelize,
     modelName: 'covorc_section_types'
 });
+export function initCovorcSectionTypes() {
+    CovorcSectionType.findOrCreate({
+        where: { title: 'Коворкинг' }
+    });
+    CovorcSectionType.findOrCreate({
+        where: { title: 'Переговорная' }
+    });
+    CovorcSectionType.findOrCreate({
+        where: { title: 'Аудитория' }
+    });
+}
 //# sourceMappingURL=CovorcSectionType.js.map

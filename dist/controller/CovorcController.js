@@ -32,7 +32,7 @@ let CovorcController = class CovorcController {
     getAll() {
         return __awaiter(this, void 0, void 0, function* () {
             logger.debug(`get all covorcs`);
-            return JSON.stringify(yield Covorc.findAll());
+            return JSON.stringify(yield this.getCovorcs());
         });
     }
     createCovorc(covorc) {
@@ -48,6 +48,23 @@ let CovorcController = class CovorcController {
                 }
             });
             logger.debug(`Covorc with id = ${id} was deleted`);
+        });
+    }
+    getCovorcs() {
+        return __awaiter(this, void 0, void 0, function* () {
+            return yield Covorc.findAll().then(x => {
+                return x.map(covorc => {
+                    return {
+                        id: covorc.id,
+                        title: covorc.title,
+                        shortDesc: covorc.shortDescription,
+                        schedule: covorc.schedule,
+                        maxPrice: covorc.getMaxPrice(),
+                        minPrice: covorc.getMinPrice(),
+                        address: covorc.address
+                    };
+                });
+            });
         });
     }
 };

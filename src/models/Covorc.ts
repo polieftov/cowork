@@ -1,12 +1,14 @@
 import {sequelize} from './dbconnection.js'
 import {Model, InferAttributes, InferCreationAttributes, CreationOptional, DataTypes, ForeignKey} from "sequelize";
-import {User} from "./User";
+import {User} from "./User.js";
+import {CovorcSection} from "./CovorcSection.js";
 
 export class Covorc extends Model<InferAttributes<Covorc>, InferCreationAttributes<Covorc>> {
     declare id: CreationOptional<number>;
     declare title: string;
     declare description: string;
     declare shortDescription: string;
+    declare schedule: string;
     declare address: string;
     declare contacts: string;
     declare ownerId: ForeignKey<User['id']>;
@@ -17,6 +19,22 @@ export class Covorc extends Model<InferAttributes<Covorc>, InferCreationAttribut
     declare createdAt: CreationOptional<Date>;
     // updatedAt can be undefined during creation
     declare updatedAt: CreationOptional<Date>;
+
+    async getMaxPrice(): Promise<number> {
+        return await CovorcSection.max('price', {
+            where: {
+                covorcId: this.id
+            }
+        })
+    }
+
+    async getMinPrice(): Promise<number> {
+        return await CovorcSection.min('price', {
+            where: {
+                covorcId: this.id
+            }
+        })
+    }
 }
 
 Covorc.init(
@@ -31,6 +49,9 @@ Covorc.init(
             allowNull: false,
         },
         description: {
+            type: DataTypes.STRING,
+        },
+        schedule: {
             type: DataTypes.STRING,
         },
         shortDescription: {
@@ -57,3 +78,4 @@ Covorc.init(
         modelName: 'covorc'
     }
 )
+

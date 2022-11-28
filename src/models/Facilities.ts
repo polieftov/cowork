@@ -6,6 +6,7 @@ import {
     CreationOptional,
     DataTypes,
 } from "sequelize";
+import {CovorcSection} from "./CovorcSection.js";
 
 export class Facilities extends Model<InferAttributes<Facilities>, InferCreationAttributes<Facilities>> {
     declare id: CreationOptional<number>
@@ -37,3 +38,25 @@ Facilities.init(
         modelName: 'facilities'
     }
 )
+
+export function initFacilities() {
+    Facilities.findOrCreate({
+        where: {title: 'Wi-Fi'}
+    });
+    Facilities.findOrCreate({
+        where: {title: 'Принтер'}
+    });
+    Facilities.findOrCreate({
+        where: {title: 'Чай, кофе'}
+    });
+    Facilities.findOrCreate({
+        where: {title: 'кухня'}
+    });
+    Facilities.findOrCreate({
+        where: {title: 'ноутбук'}
+    });
+    Facilities.findOrCreate({
+        where: {title: 'Проектор'}
+    });
+}
+
