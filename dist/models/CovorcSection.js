@@ -31,10 +31,25 @@ CovorcSection.init({
     sequelize,
     modelName: 'covorc_section'
 });
+export const CovorcSection2Facilities = sequelize.define('CovorcSection2Facilities', {
+    id: {
+        type: DataTypes.INTEGER,
+        autoIncrement: true,
+        primaryKey: true,
+    },
+    covorcSection: {
+        type: DataTypes.INTEGER,
+    },
+    facilities: {
+        type: DataTypes.INTEGER,
+    }
+});
 Covorc.hasMany(CovorcSection);
 CovorcSection.belongsTo(Covorc, { foreignKey: 'covorcId' });
 CovorcSectionType.hasMany(CovorcSection);
 CovorcSection.belongsTo(CovorcSectionType, { foreignKey: 'sectionTypeId' });
-Facilities.belongsToMany(CovorcSection, { through: 'CovorcSection2Facilities', foreignKey: 'id' });
-CovorcSection.belongsToMany(Facilities, { through: 'CovorcSection2Facilities', foreignKey: 'id' });
+CovorcSection2Facilities.belongsTo(CovorcSection, { foreignKey: 'covorcSection' });
+CovorcSection.hasMany(CovorcSection2Facilities);
+CovorcSection2Facilities.belongsTo(Facilities, { foreignKey: 'facilities' });
+Facilities.hasMany(CovorcSection2Facilities);
 //# sourceMappingURL=CovorcSection.js.map

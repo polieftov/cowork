@@ -42,20 +42,6 @@ Booking.init(
         date: {
             type: DataTypes.DATE,
         },
-        userId: {
-            type: DataTypes.INTEGER,
-            references: {
-                model: User,
-                key: 'id'
-            }
-        },
-        covorcSectionId: {
-            type: DataTypes.INTEGER,
-            references: {
-                model: CovorcSection,
-                key: 'id'
-            }
-        },
         isArchived: {
             type: DataTypes.BOOLEAN,
             allowNull: false,
@@ -69,3 +55,9 @@ Booking.init(
         modelName: 'booking'
     }
 )
+
+//user covorcsection
+Booking.belongsTo(CovorcSection, {foreignKey: 'covorcSectionId'});
+CovorcSection.hasMany(Booking);
+Booking.belongsTo(User, {foreignKey: 'userId'});
+User.hasMany(Booking);

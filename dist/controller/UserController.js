@@ -36,6 +36,15 @@ let UserController = class UserController {
             return JSON.stringify(yield User.findAll());
         });
     }
+    /**
+     * {
+     *    firstName: "",
+     *    lastName: "",
+     *    login: "",
+     *    phoneNumber: "",
+     *    password: ""
+     * }
+     */
     createUser(user) {
         return __awaiter(this, void 0, void 0, function* () {
             const createdUser = User.build(user);

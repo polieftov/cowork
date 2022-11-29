@@ -32,6 +32,15 @@ export class UserController {
     return JSON.stringify(await User.findAll());
   }
 
+  /**
+   * {
+   *    firstName: "",
+   *    lastName: "",
+   *    login: "",
+   *    phoneNumber: "",
+   *    password: ""
+   * }
+   */
   @Post('/users')
   @HttpCode(200)
   @OnUndefined(500)

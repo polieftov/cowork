@@ -79,3 +79,5 @@ Covorc.init(
     }
 )
 
+Covorc.belongsTo(User, {foreignKey: 'userId'})
+User.hasMany(Covorc)

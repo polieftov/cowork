@@ -9,6 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 import { sequelize } from './dbconnection.js';
 import { Model, DataTypes } from "sequelize";
+import { User } from "./User.js";
 import { CovorcSection } from "./CovorcSection.js";
 export class Covorc extends Model {
     getMaxPrice() {
@@ -68,4 +69,6 @@ Covorc.init({
     sequelize,
     modelName: 'covorc'
 });
+Covorc.belongsTo(User, { foreignKey: 'userId' });
+User.hasMany(Covorc);
 //# sourceMappingURL=Covorc.js.map

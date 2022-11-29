@@ -7,12 +7,14 @@ import {
     JsonController,
     OnUndefined,
     Param,
-    Post,
+    Post, Put,
     Req
 } from 'routing-controllers'
 import 'reflect-metadata'
 import log4js from "log4js";
 import {Covorc} from "../models/Covorc.js";
+import {User} from "../models/User.js";
+import bcrypt from 'bcrypt'
 
 const logger = log4js.getLogger()
 
@@ -31,11 +33,34 @@ export class CovorcController {
         return JSON.stringify(await this.getCovorcs());
     }
 
+    /**
+     * {
+     *     title: "",
+     *     description: "",
+     *     schedule: "",
+     *     shortDescription: "",
+     *     address: "",
+     *     contacts: "",
+     *     userId: 1
+     * }
+     */
     @Post('/covorcs')
     @HttpCode(200)
     @OnUndefined(500)
     async createCovorc(@Body() covorc: Covorc) {
-        Covorc.create(covorc)
+        return await Covorc.create(covorc).then(c =>
+            console.log(c.title + " создан")
+        );
+    }
+
+    @Put('/covorcs/:id')
+    async updateCovorc(@Param('id') id: number, @Body() covorc: Covorc) {
+        await Covorc.findByPk(id).then(c => c.set(covorc))
+            .catch(ex => logger.debug(ex))
+            .then(c => {
+                if (c instanceof Covorc)
+                    logger.debug(`${c.title} covorc updated`)
+            })
     }
 
     @Delete('/covorcs/:id')
@@ -49,7 +74,7 @@ export class CovorcController {
     }
 
     async getCovorcs() {
-        return await Covorc.findAll().then(x => {
+        return await Covorc.findAll({include: [User]}).then(x => {
                 return x.map(covorc => {
                     return {
                         id: covorc.id,
@@ -58,7 +83,8 @@ export class CovorcController {
                         schedule: covorc.schedule,
                         maxPrice: covorc.getMaxPrice(),
                         minPrice: covorc.getMinPrice(),
-                        address: covorc.address
+                        address: covorc.address,
+                        user: covorc['user']
                     }
                 })
             }

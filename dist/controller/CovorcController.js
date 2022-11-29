@@ -16,10 +16,11 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-import { Body, Delete, Get, HttpCode, JsonController, OnUndefined, Param, Post } from 'routing-controllers';
+import { Body, Delete, Get, HttpCode, JsonController, OnUndefined, Param, Post, Put } from 'routing-controllers';
 import 'reflect-metadata';
 import log4js from "log4js";
 import { Covorc } from "../models/Covorc.js";
+import { User } from "../models/User.js";
 const logger = log4js.getLogger();
 let CovorcController = class CovorcController {
     getOne(id) {
@@ -35,9 +36,30 @@ let CovorcController = class CovorcController {
             return JSON.stringify(yield this.getCovorcs());
         });
     }
+    /**
+     * {
+     *     title: "",
+     *     description: "",
+     *     schedule: "",
+     *     shortDescription: "",
+     *     address: "",
+     *     contacts: "",
+     *     userId: 1
+     * }
+     */
     createCovorc(covorc) {
         return __awaiter(this, void 0, void 0, function* () {
-            Covorc.create(covorc);
+            return yield Covorc.create(covorc).then(c => console.log(c.title + " создан"));
+        });
+    }
+    updateCovorc(id, covorc) {
+        return __awaiter(this, void 0, void 0, function* () {
+            yield Covorc.findByPk(id).then(c => c.set(covorc))
+                .catch(ex => logger.debug(ex))
+                .then(c => {
+                if (c instanceof Covorc)
+                    logger.debug(`${c.title} covorc updated`);
+            });
         });
     }
     deleteOne(id) {
@@ -52,7 +74,7 @@ let CovorcController = class CovorcController {
     }
     getCovorcs() {
         return __awaiter(this, void 0, void 0, function* () {
-            return yield Covorc.findAll().then(x => {
+            return yield Covorc.findAll({ include: [User] }).then(x => {
                 return x.map(covorc => {
                     return {
                         id: covorc.id,
@@ -61,7 +83,8 @@ let CovorcController = class CovorcController {
                         schedule: covorc.schedule,
                         maxPrice: covorc.getMaxPrice(),
                         minPrice: covorc.getMinPrice(),
-                        address: covorc.address
+                        address: covorc.address,
+                        user: covorc['user']
                     };
                 });
             });
@@ -81,6 +104,11 @@ __decorate([
     OnUndefined(500),
     __param(0, Body())
 ], CovorcController.prototype, "createCovorc", null);
+__decorate([
+    Put('/covorcs/:id'),
+    __param(0, Param('id')),
+    __param(1, Body())
+], CovorcController.prototype, "updateCovorc", null);
 __decorate([
     Delete('/covorcs/:id'),
     __param(0, Param('id'))
