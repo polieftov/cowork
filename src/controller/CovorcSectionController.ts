@@ -29,11 +29,15 @@ export class CovorcSectionController {
     @HttpCode(200)
     @OnUndefined(400)
     async getOne(@Param('id') id: number) {
-        let covorc: CovorcSection[] = await CovorcSection.findAll({where: {id: id}});
+        let covorc: CovorcSection[] = await CovorcSection.findAll({
+            where: {id: id},
+            include: [Covorc, Facilities, CovorcSectionType]
+        });
         logger.debug(`get covorc_sections ${covorc.map(c => c.id)}`);
         return JSON.stringify(covorc);
     }
 
+    /** Вся информация о секции, включая коворкинг, к которому относится */
     @Get('/covorc_sections')
     @HttpCode(200)
     async getAll() {

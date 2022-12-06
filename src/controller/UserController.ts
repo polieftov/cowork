@@ -17,8 +17,47 @@ import log4js from "log4js";
 
 const logger = log4js.getLogger()
 
+type Credentials = {
+  login: string,
+  email: string,
+  password: string
+}
+
 @JsonController()
 export class UserController {
+
+  @Post('/signUp')
+  @OnUndefined(404)
+  async signUp(@Body() credentials: Credentials): Promise<User> {
+    const createdUser = User.build(credentials)
+    bcrypt.hash(credentials.password, 10).then(hashedPass => {
+      createdUser.set({
+        password: hashedPass
+      });
+    })
+    logger.debug(`${createdUser.login} user created and saved`)
+    return createdUser.save().catch(ex => {
+      logger.debug(ex);
+      return undefined;
+    });
+  }
+
+  @Post('/signIn')
+  @OnUndefined(404)
+  async signIn(@Body() credentials: Credentials): Promise<User> {
+    let user: User = null
+    if (credentials.login)
+      user = await User.findOne({ where: {login: credentials.login}})
+    else if (credentials.email)
+      user = await User.findOne({ where: {email: credentials.email}})
+
+    let passwordIsValid: Boolean = bcrypt.compareSync(
+        credentials.password,
+        user.password
+    );
+    //todo  https://www.topcoder.com/thrive/articles/authentication-and-authorization-in-express-js-api-using-jwt
+  }
+
   @Get('/users/:id')
   async getOne (@Param('id') id: number) {
     let user: User[] = await User.findAll({where: {id: id}});

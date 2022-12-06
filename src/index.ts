@@ -10,6 +10,7 @@ import {CovorcController} from "./controller/CovorcController.js";
 import {initCovorcSectionTypes} from "./models/CovorcSectionType.js";
 import {initFacilities} from "./models/Facilities.js";
 import {BookingController} from "./controller/BookingController.js";
+import {RolesController} from "./controller/RolesController";
 
 dotenv.config()
 const logger = log4js.getLogger()
@@ -26,7 +27,14 @@ sequelize.sync({ alter: true }).catch((reason) => console.log(reason)).then(() =
 });
 
 const app = createExpressServer({
-  controllers: [UserController, CovorcController, CovorcSectionController, BookingController, TestController]
+  controllers: [
+    UserController,
+    CovorcController,
+    CovorcSectionController,
+    BookingController,
+    RolesController,
+    TestController
+  ]
 })
 //sync({ force: true})  This creates the table, dropping it first if it already existed
 //.sync({ alter: true }) - This checks what is the current state of the table in the database (which columns it has, what are their data types, etc), and then performs the necessary changes in the table to make it match the model.

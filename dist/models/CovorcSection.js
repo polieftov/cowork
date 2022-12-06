@@ -49,7 +49,7 @@ CovorcSection.belongsTo(Covorc, { foreignKey: 'covorcId' });
 CovorcSectionType.hasMany(CovorcSection);
 CovorcSection.belongsTo(CovorcSectionType, { foreignKey: 'sectionTypeId' });
 CovorcSection2Facilities.belongsTo(CovorcSection, { foreignKey: 'covorcSection' });
-CovorcSection.hasMany(CovorcSection2Facilities);
+CovorcSection.belongsToMany(Facilities, { through: CovorcSection2Facilities });
 CovorcSection2Facilities.belongsTo(Facilities, { foreignKey: 'facilities' });
-Facilities.hasMany(CovorcSection2Facilities);
+Facilities.belongsToMany(CovorcSection, { through: CovorcSection2Facilities });
 //# sourceMappingURL=CovorcSection.js.map

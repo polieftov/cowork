@@ -6,6 +6,7 @@ export class User extends Model<InferAttributes<User>, InferCreationAttributes<U
     declare firstName: string;
     declare lastName: string;
     declare login: string;
+    declare email: string;
     declare phoneNumber: string;
     declare password: string;
 
@@ -34,6 +35,9 @@ User.init(
         login: {
             type: DataTypes.STRING,
             allowNull: false,
+        },
+        email: {
+            type: DataTypes.STRING,
         },
         phoneNumber: {
             type: DataTypes.STRING,
