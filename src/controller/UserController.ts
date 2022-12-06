@@ -14,6 +14,8 @@ import 'reflect-metadata'
 import bcrypt from 'bcrypt'
 import {User} from '../models/User.js'
 import log4js from "log4js";
+import jsonwebtoken from 'jsonwebtoken'
+import {response} from "express";
 
 const logger = log4js.getLogger()
 
@@ -23,10 +25,16 @@ type Credentials = {
   password: string
 }
 
+//Возвращается при авторизации
+class UserWithJWT extends User {
+  jwt: string;
+  message: string;
+}
+
 @JsonController()
 export class UserController {
 
-  @Post('/signUp')
+  @Post('/register')
   @OnUndefined(404)
   async signUp(@Body() credentials: Credentials): Promise<User> {
     const createdUser = User.build(credentials)
@@ -42,20 +50,45 @@ export class UserController {
     });
   }
 
-  @Post('/signIn')
+  @Post('/login')
   @OnUndefined(404)
-  async signIn(@Body() credentials: Credentials): Promise<User> {
+  async signIn(@Body() credentials: Credentials): Promise<UserWithJWT> {
     let user: User = null
     if (credentials.login)
       user = await User.findOne({ where: {login: credentials.login}})
     else if (credentials.email)
       user = await User.findOne({ where: {email: credentials.email}})
+    else {
+      let userNotFound: UserWithJWT = new UserWithJWT()
+      userNotFound.message = "Wrong login or email"
+      return userNotFound;
+    }
 
     let passwordIsValid: Boolean = bcrypt.compareSync(
         credentials.password,
         user.password
     );
-    //todo  https://www.topcoder.com/thrive/articles/authentication-and-authorization-in-express-js-api-using-jwt
+    if (!passwordIsValid) {
+      let userNotFound: UserWithJWT = new UserWithJWT()
+      userNotFound.message = "Wrong password"
+      return userNotFound;
+    }
+
+    let token = jsonwebtoken.sign({
+      id: user.id
+    }, process.env.API_SECRET, {
+      expiresIn: 86400
+    });
+
+    let userWithJWT = new UserWithJWT();
+    userWithJWT.login = user.login;
+    userWithJWT.firstName = user.firstName;
+    userWithJWT.lastName = user.lastName;
+    userWithJWT.id = user.id;
+    userWithJWT.jwt = token;
+    userWithJWT.message = "Success";
+    return userWithJWT
+    //https://www.topcoder.com/thrive/articles/authentication-and-authorization-in-express-js-api-using-jwt
   }
 
   @Get('/users/:id')
