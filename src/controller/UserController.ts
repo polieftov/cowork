@@ -25,7 +25,7 @@ type Credentials = {
   password: string
 }
 
-//Возвращается при авторизации
+//Возвращается при успешной авторизации
 class UserWithJWT extends User {
   jwt: string;
   message: string;

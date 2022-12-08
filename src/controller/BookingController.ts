@@ -1,13 +1,15 @@
-import {Body, Delete, Get, HttpCode, JsonController, OnUndefined, Param, Post} from 'routing-controllers'
+import {Body, Delete, Get, HttpCode, JsonController, OnUndefined, Param, Post, UseAfter} from 'routing-controllers'
 import 'reflect-metadata'
 import log4js from "log4js";
 import {CovorcSection} from "../models/CovorcSection.js";
 import {Booking} from "../models/Booking.js";
 import {User} from "../models/User.js";
+import {loggingMiddleware} from "./Middleware/Auth.js";
 
 const logger = log4js.getLogger()
 
 @JsonController()
+@UseAfter(loggingMiddleware)
 export class BookingController {
     @Get('/booking/:id')
     @HttpCode(200)
