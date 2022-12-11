@@ -10,7 +10,7 @@ import {CovorcController} from "./controller/CovorcController.js";
 import {initCovorcSectionTypes} from "./models/CovorcSectionType.js";
 import {initFacilities} from "./models/Facilities.js";
 import {BookingController} from "./controller/BookingController.js";
-import {RolesController} from "./controller/RolesController";
+import {RolesController} from "./controller/RolesController.js";
 
 dotenv.config()
 const logger = log4js.getLogger()

@@ -3,6 +3,7 @@ import { Model, DataTypes } from "sequelize";
 import { Covorc } from "./Covorc.js";
 import { CovorcSectionType } from "./CovorcSectionType.js";
 import { Facilities } from "./Facilities.js";
+import { CovorcSectionsPictures } from "./CovorcSectionsPictures.js";
 export class CovorcSection extends Model {
 }
 CovorcSection.init({
@@ -52,4 +53,6 @@ CovorcSection2Facilities.belongsTo(CovorcSection, { foreignKey: 'covorcSection' 
 CovorcSection.belongsToMany(Facilities, { through: CovorcSection2Facilities });
 CovorcSection2Facilities.belongsTo(Facilities, { foreignKey: 'facilities' });
 Facilities.belongsToMany(CovorcSection, { through: CovorcSection2Facilities });
+CovorcSectionsPictures.belongsTo(CovorcSection, { foreignKey: "covorcSectionId" });
+CovorcSection.hasMany(CovorcSectionsPictures);
 //# sourceMappingURL=CovorcSection.js.map

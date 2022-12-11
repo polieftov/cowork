@@ -1,11 +1,11 @@
 import {sequelize} from './dbconnection.js'
-import {Model, InferAttributes, InferCreationAttributes, CreationOptional, DataTypes} from "sequelize";
+import {CreationOptional, DataTypes, ForeignKey, InferAttributes, InferCreationAttributes, Model} from "sequelize";
 import {CovorcSection} from "./CovorcSection.js";
 
 export class CovorcSectionsPictures extends Model<InferAttributes<CovorcSectionsPictures>, InferCreationAttributes<CovorcSectionsPictures>> {
     declare id: CreationOptional<number>;
     declare path: number;
-
+    declare covorcSectionId: ForeignKey<CovorcSection['id']>;
     // timestamps!
     // createdAt can be undefined during creation
     declare createdAt: CreationOptional<Date>;

@@ -11,6 +11,7 @@ import {
 import {Covorc} from "./Covorc.js";
 import {CovorcSectionType} from "./CovorcSectionType.js";
 import {Facilities} from "./Facilities.js";
+import {CovorcSectionsPictures} from "./CovorcSectionsPictures.js";
 
 export class CovorcSection extends Model<InferAttributes<CovorcSection>, InferCreationAttributes<CovorcSection>> {
     declare id: CreationOptional<number>
@@ -77,8 +78,10 @@ export const CovorcSection2Facilities = sequelize.define('CovorcSection2Faciliti
 Covorc.hasMany(CovorcSection);
 CovorcSection.belongsTo(Covorc, {foreignKey: 'covorcId'});
 CovorcSectionType.hasMany(CovorcSection);
-CovorcSection.belongsTo(CovorcSectionType, {foreignKey: 'sectionTypeId'})
-CovorcSection2Facilities.belongsTo(CovorcSection, {foreignKey: 'covorcSection'})
-CovorcSection.belongsToMany(Facilities, { through: CovorcSection2Facilities })
-CovorcSection2Facilities.belongsTo(Facilities, {foreignKey: 'facilities'})
-Facilities.belongsToMany(CovorcSection, { through: CovorcSection2Facilities })
+CovorcSection.belongsTo(CovorcSectionType, {foreignKey: 'sectionTypeId'});
+CovorcSection2Facilities.belongsTo(CovorcSection, {foreignKey: 'covorcSection'});
+CovorcSection.belongsToMany(Facilities, { through: CovorcSection2Facilities });
+CovorcSection2Facilities.belongsTo(Facilities, {foreignKey: 'facilities'});
+Facilities.belongsToMany(CovorcSection, { through: CovorcSection2Facilities });
+CovorcSectionsPictures.belongsTo(CovorcSection, { foreignKey: "covorcSectionId"})
+CovorcSection.hasMany(CovorcSectionsPictures);

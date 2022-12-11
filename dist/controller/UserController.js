@@ -21,8 +21,61 @@ import 'reflect-metadata';
 import bcrypt from 'bcrypt';
 import { User } from '../models/User.js';
 import log4js from "log4js";
+import jsonwebtoken from 'jsonwebtoken';
 const logger = log4js.getLogger();
+//Возвращается при успешной авторизации
+class UserWithJWT extends User {
+}
 let UserController = class UserController {
+    signUp(credentials) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const createdUser = User.build(credentials);
+            bcrypt.hash(credentials.password, 10).then(hashedPass => {
+                createdUser.set({
+                    password: hashedPass
+                });
+            });
+            logger.debug(`${createdUser.login} user created and saved`);
+            return createdUser.save().catch(ex => {
+                logger.debug(ex);
+                return undefined;
+            });
+        });
+    }
+    signIn(credentials) {
+        return __awaiter(this, void 0, void 0, function* () {
+            let user = null;
+            if (credentials.login)
+                user = yield User.findOne({ where: { login: credentials.login } });
+            else if (credentials.email)
+                user = yield User.findOne({ where: { email: credentials.email } });
+            else {
+                let userNotFound = new UserWithJWT();
+                userNotFound.message = "Wrong login or email";
+                return userNotFound;
+            }
+            let passwordIsValid = bcrypt.compareSync(credentials.password, user.password);
+            if (!passwordIsValid) {
+                let userNotFound = new UserWithJWT();
+                userNotFound.message = "Wrong password";
+                return userNotFound;
+            }
+            let token = jsonwebtoken.sign({
+                id: user.id
+            }, process.env.API_SECRET, {
+                expiresIn: 86400
+            });
+            let userWithJWT = new UserWithJWT();
+            userWithJWT.login = user.login;
+            userWithJWT.firstName = user.firstName;
+            userWithJWT.lastName = user.lastName;
+            userWithJWT.id = user.id;
+            userWithJWT.jwt = token;
+            userWithJWT.message = "Success";
+            return userWithJWT;
+            //https://www.topcoder.com/thrive/articles/authentication-and-authorization-in-express-js-api-using-jwt
+        });
+    }
     getOne(id) {
         return __awaiter(this, void 0, void 0, function* () {
             let user = yield User.findAll({ where: { id: id } });
@@ -68,6 +121,16 @@ let UserController = class UserController {
         });
     }
 };
+__decorate([
+    Post('/register'),
+    OnUndefined(404),
+    __param(0, Body())
+], UserController.prototype, "signUp", null);
+__decorate([
+    Post('/login'),
+    OnUndefined(404),
+    __param(0, Body())
+], UserController.prototype, "signIn", null);
 __decorate([
     Get('/users/:id'),
     __param(0, Param('id'))

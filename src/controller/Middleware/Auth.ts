@@ -1,4 +1,4 @@
-import {jsonwebtoken} from 'jsonwebtoken'
+import jsonwebtoken from 'jsonwebtoken'
 import {User} from "../../models/User.js";
 
 export const loggingMiddleware = (req: any, res: any, next?: (err?: any) => any) => {

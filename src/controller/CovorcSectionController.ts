@@ -8,7 +8,7 @@ import {
     OnUndefined,
     Param,
     Post,
-    Req
+    Req, UploadedFiles
 } from 'routing-controllers'
 import 'reflect-metadata'
 import log4js from "log4js";
@@ -60,6 +60,31 @@ export class CovorcSectionController {
     @HttpCode(200)
     @OnUndefined(400)
     async createCovorcSection(@Body() covorcSections: CovorcSectionWithFacilities) {
+        CovorcSection.create(covorcSections)
+        if (covorcSections.facilities)
+            covorcSections.facilities.map(facId => {
+                CovorcSection2Facilities.create({
+                    covorcSection: covorcSections.id,
+                    facilities: facId
+                })
+            })
+
+    }
+
+    /**
+     * {
+     *     covorcId: 1,
+     *     description: "",
+     *     sectionTypeId: 1,
+     *     placesCount: 1,
+     *     price: 1,
+     *     facilities: [1,2,3]
+     * }
+     */
+    @Post('/covorc_sections/load_photo')
+    @HttpCode(200)
+    @OnUndefined(400)
+    async loadCovorcSectionPhotos(@UploadedFiles() files: File[]) {
         CovorcSection.create(covorcSections)
         if (covorcSections.facilities)
             covorcSections.facilities.map(facId => {

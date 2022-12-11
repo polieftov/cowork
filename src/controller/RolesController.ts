@@ -22,11 +22,7 @@ export class RolesController {
 
     /**
      * {
-     *    firstName: "",
-     *    lastName: "",
-     *    login: "",
-     *    phoneNumber: "",
-     *    password: ""
+     *    title: ""
      * }
      */
     @Post('/roles')
