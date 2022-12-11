@@ -3,11 +3,11 @@ import {Model, InferAttributes, InferCreationAttributes, CreationOptional, DataT
 
 export class User extends Model<InferAttributes<User>, InferCreationAttributes<User>> {
     declare id: CreationOptional<number>;
-    declare firstName: string;
-    declare lastName: string;
+    declare firstName: CreationOptional<string>;
+    declare lastName: CreationOptional<string>;
     declare login: string;
     declare email: string;
-    declare phoneNumber: string;
+    declare phoneNumber: CreationOptional<string>;
     declare password: string;
 
     // timestamps!
@@ -27,7 +27,6 @@ User.init(
         },
         firstName: {
             type: DataTypes.STRING,
-            allowNull: false,
         },
         lastName: {
             type: DataTypes.STRING,
@@ -41,7 +40,6 @@ User.init(
         },
         phoneNumber: {
             type: DataTypes.STRING,
-            allowNull: false,
         },
         password: {
             type: DataTypes.STRING,

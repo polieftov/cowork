@@ -27,6 +27,13 @@ const logger = log4js.getLogger();
 class UserWithJWT extends User {
 }
 let UserController = class UserController {
+    /**
+     * {
+     *    login: "",
+     *    email: "",
+     *    password: ""
+     * }
+     */
     signUp(credentials) {
         return __awaiter(this, void 0, void 0, function* () {
             const createdUser = User.build(credentials);
@@ -34,10 +41,12 @@ let UserController = class UserController {
                 createdUser.set({
                     password: hashedPass
                 });
-            });
-            logger.debug(`${createdUser.login} user created and saved`);
-            return createdUser.save().catch(ex => {
-                logger.debug(ex);
+                return createdUser.save().then(user => logger.debug(`${user.login} user created and saved`)).catch(ex => {
+                    logger.debug(ex);
+                    return undefined;
+                });
+            }).catch(ex => {
+                logger.debug(ex + " pass cannot be hashed");
                 return undefined;
             });
         });

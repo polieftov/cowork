@@ -34,20 +34,29 @@ class UserWithJWT extends User {
 @JsonController()
 export class UserController {
 
+  /**
+   * {
+   *    login: "",
+   *    email: "",
+   *    password: ""
+   * }
+   */
   @Post('/register')
   @OnUndefined(404)
-  async signUp(@Body() credentials: Credentials): Promise<User> {
+  async signUp(@Body() credentials: Credentials) {
     const createdUser = User.build(credentials)
     bcrypt.hash(credentials.password, 10).then(hashedPass => {
       createdUser.set({
         password: hashedPass
       });
-    })
-    logger.debug(`${createdUser.login} user created and saved`)
-    return createdUser.save().catch(ex => {
-      logger.debug(ex);
+      return createdUser.save().then(user => logger.debug(`${user.login} user created and saved`)).catch(ex => {
+        logger.debug(ex);
+        return undefined;
+      });
+    }).catch(ex => {
+      logger.debug(ex + " pass cannot be hashed")
       return undefined;
-    });
+    })
   }
 
   @Post('/login')

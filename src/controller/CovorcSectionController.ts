@@ -1,21 +1,12 @@
-import {
-    Body,
-    Controller,
-    Delete,
-    Get,
-    HttpCode,
-    JsonController,
-    OnUndefined,
-    Param,
-    Post,
-    Req, UploadedFiles
-} from 'routing-controllers'
+import {Body, Delete, Get, HttpCode, JsonController, OnUndefined, Param, Post, UploadedFiles} from 'routing-controllers'
 import 'reflect-metadata'
 import log4js from "log4js";
 import {CovorcSection, CovorcSection2Facilities} from "../models/CovorcSection.js";
 import {Covorc} from "../models/Covorc.js";
 import {Facilities} from "../models/Facilities.js";
 import {CovorcSectionType} from "../models/CovorcSectionType.js";
+import multer from 'multer'
+import {CovorcSectionsPictures} from "../models/CovorcSectionsPictures.js";
 
 const logger = log4js.getLogger()
 
@@ -73,26 +64,33 @@ export class CovorcSectionController {
 
     /**
      * {
-     *     covorcId: 1,
-     *     description: "",
-     *     sectionTypeId: 1,
-     *     placesCount: 1,
-     *     price: 1,
-     *     facilities: [1,2,3]
+     *
      * }
      */
-    @Post('/covorc_sections/load_photo')
+    @Post('/covorc_sections/load_photo/:covorcSectionId')
     @HttpCode(200)
     @OnUndefined(400)
-    async loadCovorcSectionPhotos(@UploadedFiles() files: File[]) {
-        CovorcSection.create(covorcSections)
-        if (covorcSections.facilities)
-            covorcSections.facilities.map(facId => {
-                CovorcSection2Facilities.create({
-                    covorcSection: covorcSections.id,
-                    facilities: facId
-                })
-            })
+    async loadCovorcSectionPhotos(@UploadedFiles("filename", {
+                                      options: {
+                                          storage: multer.diskStorage({
+                                              destination: function (req, file, cb) {
+                                                  cb(null, '/static')
+                                              },
+                                              filename: function (req, file, cb) {
+                                                  cb(null, file.fieldname + '-' + Date.now())
+                                              }
+                                          })
+                                      }
+                                  }) files: File[],
+                                  @Param('covorcSectionId') covorcSectionId: number
+    ) {
+        files.map(file => {
+            const picture = CovorcSectionsPictures.build(file.name);
+            picture.set({
+                covorcSectionId: covorcSectionId
+            });
+            picture.save()
+        })
 
     }
 
