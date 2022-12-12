@@ -27,6 +27,16 @@ export class BookingController {
         return JSON.stringify(await Booking.findAll({include: [CovorcSection, User]}));
     }
 
+    /**
+     * {
+     *     price: 1,
+     *     hours: 1,
+     *     countOfPeoples: 1,
+     *     date: "2012-04-23T18:25:43.511Z",
+     *     userId: 1,
+     *     covorcSectionId: 1
+     * }
+     */
     @Post('/bookings')
     @HttpCode(200)
     @OnUndefined(400)
