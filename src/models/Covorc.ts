@@ -11,7 +11,7 @@ export class Covorc extends Model<InferAttributes<Covorc>, InferCreationAttribut
     declare schedule: string;
     declare address: string;
     declare contacts: string;
-    declare ownerId: ForeignKey<User['id']>;
+    declare userId: ForeignKey<User['id']>;
     declare isArchived: boolean;
 
     // timestamps!

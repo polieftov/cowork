@@ -1,3 +1,12 @@
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
 import dotenv from 'dotenv';
 import log4js from 'log4js';
 import { createExpressServer } from 'routing-controllers';
@@ -18,14 +27,16 @@ const logger = log4js.getLogger();
 const port = process.env.PORT;
 logger.level = process.env.LOG_LEVEL;
 function fillTestData() {
-    initCovorcSectionTypes();
-    initFacilities();
-    initUsers();
-    initCovorcs();
-    initCovorcSections();
+    return __awaiter(this, void 0, void 0, function* () {
+        initCovorcSectionTypes()
+            .then(() => initFacilities())
+            .then(() => initUsers())
+            .then(() => initCovorcs())
+            .then(() => initCovorcSections());
+    });
 }
 function initCovorcSections() {
-    Covorc.findOne({ where: { title: "Супер-коворк" } }).then(covorc => {
+    return Covorc.findOne({ where: { title: "Супер-коворк" } }).then(covorc => {
         CovorcSection.findOrCreate({
             where: {
                 covorcId: covorc.id,
@@ -39,8 +50,7 @@ function initCovorcSections() {
             CovorcSection2Facilities.findOrCreate({ where: { covorcSection: covorcSection[0].id, facilities: 2 } });
             CovorcSection2Facilities.findOrCreate({ where: { covorcSection: covorcSection[0].id, facilities: 3 } });
         });
-    });
-    Covorc.findOne({ where: { title: "Супер-коворк" } }).then(covorc => {
+    }).then(() => Covorc.findOne({ where: { title: "Супер-коворк" } }).then(covorc => {
         CovorcSection.findOrCreate({
             where: {
                 covorcId: covorc.id,
@@ -54,8 +64,7 @@ function initCovorcSections() {
             CovorcSection2Facilities.findOrCreate({ where: { covorcSection: covorcSection[0].id, facilities: 2 } });
             CovorcSection2Facilities.findOrCreate({ where: { covorcSection: covorcSection[0].id, facilities: 3 } });
         });
-    });
-    Covorc.findOne({ where: { title: "Супер-пупер коворкинг" } }).then(covorc => {
+    })).then(() => Covorc.findOne({ where: { title: "Супер-пупер коворкинг" } }).then(covorc => {
         CovorcSection.findOrCreate({
             where: {
                 covorcId: covorc.id,
@@ -72,8 +81,7 @@ function initCovorcSections() {
             CovorcSection2Facilities.findOrCreate({ where: { covorcSection: covorcSection[0].id, facilities: 5 } });
             CovorcSection2Facilities.findOrCreate({ where: { covorcSection: covorcSection[0].id, facilities: 6 } });
         });
-    });
-    Covorc.findOne({ where: { title: "Супер-пупер переговорка" } }).then(covorc => {
+    })).then(() => Covorc.findOne({ where: { title: "Супер-пупер коворкинг" } }).then(covorc => {
         CovorcSection.findOrCreate({
             where: {
                 covorcId: covorc.id,
@@ -90,8 +98,7 @@ function initCovorcSections() {
             CovorcSection2Facilities.findOrCreate({ where: { covorcSection: covorcSection[0].id, facilities: 5 } });
             CovorcSection2Facilities.findOrCreate({ where: { covorcSection: covorcSection[0].id, facilities: 6 } });
         });
-    });
-    Covorc.findOne({ where: { title: "Супер-пупер аудитория" } }).then(covorc => {
+    })).then(() => Covorc.findOne({ where: { title: "Супер-пупер коворкинг" } }).then(covorc => {
         CovorcSection.findOrCreate({
             where: {
                 covorcId: covorc.id,
@@ -108,11 +115,11 @@ function initCovorcSections() {
             CovorcSection2Facilities.findOrCreate({ where: { covorcSection: covorcSection[0].id, facilities: 5 } });
             CovorcSection2Facilities.findOrCreate({ where: { covorcSection: covorcSection[0].id, facilities: 6 } });
         });
-    });
+    }));
 }
 function initCovorcs() {
-    User.findOne({ where: { login: "user1" } }).then(user => {
-        Covorc.findOrCreate({
+    return User.findOne({ where: { login: "user1" } }).then(user => {
+        return Covorc.findOrCreate({
             where: {
                 title: "Супер-коворк",
                 description: "У нас вообще отличный коворкинг, придешь, уходить не зачхочешь, это невероятно, мы тут живем и всем советуем! Кофе, чай, печенье, все четко, электричество, вода, еда, все есть!",
@@ -120,46 +127,46 @@ function initCovorcs() {
                 schedule: "Пн-Вс - 8:00 - 21:00",
                 address: "г. Екатеринбург ул. Ленина 1 к2",
                 contacts: "Тел 89213492131",
-                ownerId: user.id,
+                userId: user.id,
             }
         });
-    });
-    User.findOne({ where: { login: "user1" } }).then(user => {
-        Covorc.findOrCreate({
-            where: {
-                title: "Супер-пупер коворкинг",
-                description: "У нас вообще очень отличный коворкинг, лучший в мире, придешь, уходить не зачхочешь, это невероятно, мы тут живем и всем советуем! Кофе, чай, печенье, все четко, электричество, вода, еда, все есть!",
-                shortDescription: "У нас супер коворкинг, приходите!",
-                schedule: "Пн-Вc",
-                address: "г. Екатеринбург ул. Ленина 111",
-                contacts: "Тел 8921349777",
-                ownerId: user.id,
-            }
+    }).then(() => {
+        return User.findOne({ where: { login: "user1" } }).then(user => {
+            Covorc.findOrCreate({
+                where: {
+                    title: "Супер-пупер коворкинг",
+                    description: "У нас вообще очень отличный коворкинг, лучший в мире, придешь, уходить не зачхочешь, это невероятно, мы тут живем и всем советуем! Кофе, чай, печенье, все четко, электричество, вода, еда, все есть!",
+                    shortDescription: "У нас супер коворкинг, приходите!",
+                    schedule: "Пн-Вc",
+                    address: "г. Екатеринбург ул. Ленина 111",
+                    contacts: "Тел 8921349777",
+                    userId: user.id,
+                }
+            });
         });
     });
 }
 function initUsers() {
-    User.findOrCreate({
+    return User.findOrCreate({
         where: {
             login: 'user1',
             email: 'user1@mail.com',
             password: '$2b$10$kgXWKiqGxStsc/8OFELhbuI5tZu70mjvm010MOFqO87eP6ZSqMv1i',
             phoneNumber: '89999999999'
         } //password - 123
-    });
-    User.findOrCreate({
+    }).then(() => User.findOrCreate({
         where: {
             login: 'user2',
             email: 'user2@mail.com',
             password: '$2b$10$kgXWKiqGxStsc/8OFELhbuI5tZu70mjvm010MOFqO87eP6ZSqMv1i',
             phoneNumber: '89999999999'
         }
-    });
+    }));
 }
-sequelize.sync({ alter: true }).catch((reason) => console.log(reason)).then(() => {
+sequelize.sync({ alter: true, force: true }).catch((reason) => console.log(reason)).then(() => {
     logger.debug("All models were synchronized successfully.");
-    //инициализация типов, являющихся перечислением
-    fillTestData();
+    //создание тестовых данных
+    fillTestData().then(() => logger.debug("Test data successfully created."));
 });
 const app = createExpressServer({
     controllers: [

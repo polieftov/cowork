@@ -1,6 +1,5 @@
 import {sequelize} from './dbconnection.js'
-import {Model, InferAttributes, InferCreationAttributes, CreationOptional, DataTypes} from "sequelize";
-import {CovorcSection} from "./CovorcSection.js";
+import {CreationOptional, DataTypes, InferAttributes, InferCreationAttributes, Model} from "sequelize";
 
 export class CovorcSectionType extends Model<InferAttributes<CovorcSectionType>, InferCreationAttributes<CovorcSectionType>> {
     declare id: CreationOptional<number>;
@@ -12,7 +11,6 @@ export class CovorcSectionType extends Model<InferAttributes<CovorcSectionType>,
     // updatedAt can be undefined during creation
     declare updatedAt: CreationOptional<Date>;
 }
-
 
 CovorcSectionType.init(
     {
@@ -35,14 +33,15 @@ CovorcSectionType.init(
 )
 
 export function initCovorcSectionTypes() {
-    CovorcSectionType.findOrCreate({
+    return CovorcSectionType.findOrCreate({
         where: {title: 'Коворкинг'}
-    });
-    CovorcSectionType.findOrCreate({
-        where: {title: 'Переговорная'}
-    });
-    CovorcSectionType.findOrCreate({
-        where: {title: 'Аудитория'}
+    }).then(() => {
+        CovorcSectionType.findOrCreate({
+            where: {title: 'Переговорная'}
+        });
+        CovorcSectionType.findOrCreate({
+            where: {title: 'Аудитория'}
+        })
     });
 }
 

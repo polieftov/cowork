@@ -1,5 +1,5 @@
 import { sequelize } from './dbconnection.js';
-import { Model, DataTypes } from "sequelize";
+import { DataTypes, Model } from "sequelize";
 export class CovorcSectionType extends Model {
 }
 CovorcSectionType.init({
@@ -19,14 +19,15 @@ CovorcSectionType.init({
     modelName: 'covorc_section_types'
 });
 export function initCovorcSectionTypes() {
-    CovorcSectionType.findOrCreate({
+    return CovorcSectionType.findOrCreate({
         where: { title: 'Коворкинг' }
-    });
-    CovorcSectionType.findOrCreate({
-        where: { title: 'Переговорная' }
-    });
-    CovorcSectionType.findOrCreate({
-        where: { title: 'Аудитория' }
+    }).then(() => {
+        CovorcSectionType.findOrCreate({
+            where: { title: 'Переговорная' }
+        });
+        CovorcSectionType.findOrCreate({
+            where: { title: 'Аудитория' }
+        });
     });
 }
 //# sourceMappingURL=CovorcSectionType.js.map

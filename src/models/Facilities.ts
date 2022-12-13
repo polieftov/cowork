@@ -39,24 +39,25 @@ Facilities.init(
     }
 )
 
-export function initFacilities() {
-    Facilities.findOrCreate({
+export function initFacilities(): Promise<any> {
+    return Facilities.findOrCreate({
         where: {title: 'Wi-Fi'}
-    });
-    Facilities.findOrCreate({
-        where: {title: 'Принтер'}
-    });
-    Facilities.findOrCreate({
-        where: {title: 'Чай, кофе'}
-    });
-    Facilities.findOrCreate({
-        where: {title: 'кухня'}
-    });
-    Facilities.findOrCreate({
-        where: {title: 'ноутбук'}
-    });
-    Facilities.findOrCreate({
-        where: {title: 'Проектор'}
+    }).then(() => {
+        Facilities.findOrCreate({
+            where: {title: 'Принтер'}
+        });
+        Facilities.findOrCreate({
+            where: {title: 'Чай, кофе'}
+        });
+        Facilities.findOrCreate({
+            where: {title: 'кухня'}
+        });
+        Facilities.findOrCreate({
+            where: {title: 'ноутбук'}
+        });
+        Facilities.findOrCreate({
+            where: {title: 'Проектор'}
+        })
     });
 }
 
