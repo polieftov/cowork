@@ -20,7 +20,8 @@ import { Body, Delete, Get, HttpCode, JsonController, OnUndefined, Param, Post, 
 import 'reflect-metadata';
 import log4js from "log4js";
 import { Covorc } from "../models/Covorc.js";
-import { User } from "../models/User.js";
+import { sequelize } from "../models/dbconnection.js";
+import { QueryTypes } from "sequelize";
 const logger = log4js.getLogger();
 let CovorcController = class CovorcController {
     getOne(id) {
@@ -73,22 +74,13 @@ let CovorcController = class CovorcController {
         });
     }
     getCovorcs() {
-        return __awaiter(this, void 0, void 0, function* () {
-            return yield Covorc.findAll({ include: [User] }).then(x => {
-                return x.map(covorc => {
-                    return {
-                        id: covorc.id,
-                        title: covorc.title,
-                        shortDesc: covorc.shortDescription,
-                        schedule: covorc.schedule,
-                        maxPrice: covorc.getMaxPrice(),
-                        minPrice: covorc.getMinPrice(),
-                        address: covorc.address,
-                        user: covorc['user']
-                    };
-                });
-            });
-        });
+        const query = `
+        select c.id, c.title, c."shortDescription", c.schedule, c.address, max(cs.price) "maxPrice", min(cs.price) "minPrice"
+        from covorcs c
+        join covorc_sections cs on c.id = cs."covorcId"
+        group by c.id
+        `;
+        return sequelize.query(query, { type: QueryTypes.SELECT });
     }
 };
 __decorate([

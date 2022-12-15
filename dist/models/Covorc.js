@@ -13,12 +13,10 @@ import { User } from "./User.js";
 import { CovorcSection } from "./CovorcSection.js";
 export class Covorc extends Model {
     getMaxPrice() {
-        return __awaiter(this, void 0, void 0, function* () {
-            return yield CovorcSection.max('price', {
-                where: {
-                    covorcId: this.id
-                }
-            });
+        return CovorcSection.max('price', {
+            where: {
+                covorcId: this.id
+            }
         });
     }
     getMinPrice() {

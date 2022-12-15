@@ -20,21 +20,6 @@ export class Covorc extends Model<InferAttributes<Covorc>, InferCreationAttribut
     // updatedAt can be undefined during creation
     declare updatedAt: CreationOptional<Date>;
 
-    async getMaxPrice(): Promise<number> {
-        return await CovorcSection.max('price', {
-            where: {
-                covorcId: this.id
-            }
-        })
-    }
-
-    async getMinPrice(): Promise<number> {
-        return await CovorcSection.min('price', {
-            where: {
-                covorcId: this.id
-            }
-        })
-    }
 }
 
 Covorc.init(

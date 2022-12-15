@@ -1,20 +1,10 @@
-import {
-    Body,
-    Controller,
-    Delete,
-    Get,
-    HttpCode,
-    JsonController,
-    OnUndefined,
-    Param,
-    Post, Put,
-    Req
-} from 'routing-controllers'
+import {Body, Delete, Get, HttpCode, JsonController, OnUndefined, Param, Post, Put} from 'routing-controllers'
 import 'reflect-metadata'
 import log4js from "log4js";
 import {Covorc} from "../models/Covorc.js";
-import {User} from "../models/User.js";
-import bcrypt from 'bcrypt'
+import {CovorcSection} from "../models/CovorcSection.js";
+import {sequelize} from "../models/dbconnection.js";
+import {QueryTypes} from "sequelize";
 
 const logger = log4js.getLogger()
 
@@ -73,22 +63,23 @@ export class CovorcController {
         logger.debug(`Covorc with id = ${id} was deleted`);
     }
 
-    async getCovorcs() {
-        return await Covorc.findAll({include: [User]}).then(x => {
-                return x.map(covorc => {
-                    return {
-                        id: covorc.id,
-                        title: covorc.title,
-                        shortDesc: covorc.shortDescription,
-                        schedule: covorc.schedule,
-                        maxPrice: covorc.getMaxPrice(),
-                        minPrice: covorc.getMinPrice(),
-                        address: covorc.address,
-                        user: covorc['user']
-                    }
-                })
-            }
-        )
+    getCovorcs(): Promise<CovorcToGet[]> {
+        const query = `
+        select c.id, c.title, c."shortDescription", c.schedule, c.address, max(cs.price) "maxPrice", min(cs.price) "minPrice"
+        from covorcs c
+        join covorc_sections cs on c.id = cs."covorcId"
+        group by c.id
+        `
+        return sequelize.query(query, {type: QueryTypes.SELECT})
     }
+}
 
+type CovorcToGet = {
+    id: number,
+    title: string,
+    shortDescription: string,
+    schedule: string,
+    maxPrice: number;
+    minPrice: number;
+    address: string;
 }
