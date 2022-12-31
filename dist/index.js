@@ -169,6 +169,7 @@ sequelize.sync({ alter: true, force: true }).catch((reason) => console.log(reaso
     fillTestData().then(() => logger.debug("Test data successfully created."));
 });
 const app = createExpressServer({
+    cors: true,
     controllers: [
         UserController,
         CovorcController,
