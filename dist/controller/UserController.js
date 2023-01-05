@@ -22,6 +22,7 @@ import bcrypt from 'bcrypt';
 import { User } from '../models/User.js';
 import log4js from "log4js";
 import jsonwebtoken from 'jsonwebtoken';
+import { Op } from "sequelize";
 const logger = log4js.getLogger();
 //Возвращается при успешной авторизации
 class UserWithJWT extends User {
@@ -36,12 +37,25 @@ let UserController = class UserController {
      */
     signUp(credentials) {
         return __awaiter(this, void 0, void 0, function* () {
+            const userWithEmailOrLogin = yield User.findOne({
+                where: {
+                    [Op.or]: [
+                        { login: credentials.login },
+                        { email: credentials.email }
+                    ]
+                }
+            });
+            if (userWithEmailOrLogin)
+                return userWithEmailOrLogin;
             const createdUser = User.build(credentials);
-            bcrypt.hash(credentials.password, 10).then(hashedPass => {
+            return bcrypt.hash(credentials.password, 10).then(hashedPass => {
                 createdUser.set({
                     password: hashedPass
                 });
-                return createdUser.save().then(user => logger.debug(`${user.login} user created and saved`)).catch(ex => {
+                return createdUser.save().then(user => {
+                    logger.debug(`${user.login} user created and saved`);
+                    return user;
+                }).catch(ex => {
                     logger.debug(ex);
                     return undefined;
                 });
@@ -137,7 +151,7 @@ __decorate([
 ], UserController.prototype, "signUp", null);
 __decorate([
     Post('/login'),
-    OnUndefined(404),
+    OnUndefined(401),
     __param(0, Body())
 ], UserController.prototype, "signIn", null);
 __decorate([

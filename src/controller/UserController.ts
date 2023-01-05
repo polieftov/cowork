@@ -1,21 +1,10 @@
-import {
-  Body,
-  Controller,
-  Delete,
-  Get,
-  HttpCode,
-  JsonController,
-  OnUndefined,
-  Param,
-  Post,
-  Req
-} from 'routing-controllers'
+import {Body, Delete, Get, HttpCode, JsonController, OnUndefined, Param, Post} from 'routing-controllers'
 import 'reflect-metadata'
 import bcrypt from 'bcrypt'
 import {User} from '../models/User.js'
 import log4js from "log4js";
 import jsonwebtoken from 'jsonwebtoken'
-import {response} from "express";
+import {Op} from "sequelize";
 
 const logger = log4js.getLogger()
 
@@ -43,16 +32,29 @@ export class UserController {
    */
   @Post('/register')
   @OnUndefined(404)
-  async signUp(@Body() credentials: Credentials) {
+  async signUp(@Body() credentials: User): Promise<User> {
+    const userWithEmailOrLogin = await User.findOne({
+      where: {
+        [Op.or]: [
+          { login: credentials.login },
+          { email: credentials.email }
+        ]
+      }
+    });
+    if (userWithEmailOrLogin)
+      return userWithEmailOrLogin;
     const createdUser = User.build(credentials)
-    bcrypt.hash(credentials.password, 10).then(hashedPass => {
+    return bcrypt.hash(credentials.password, 10).then(hashedPass => {
       createdUser.set({
         password: hashedPass
       });
-      return createdUser.save().then(user => logger.debug(`${user.login} user created and saved`)).catch(ex => {
+      return createdUser.save().then(user => {
+        logger.debug(`${user.login} user created and saved`)
+        return user
+      }).catch(ex => {
         logger.debug(ex);
         return undefined;
-      });
+      })
     }).catch(ex => {
       logger.debug(ex + " pass cannot be hashed")
       return undefined;
@@ -60,7 +62,7 @@ export class UserController {
   }
 
   @Post('/login')
-  @OnUndefined(404)
+  @OnUndefined(401)
   async signIn(@Body() credentials: Credentials): Promise<UserWithJWT> {
     let user: User = null
     if (credentials.login)
