@@ -7,6 +7,7 @@ import {Facilities} from "../models/Facilities.js";
 import {CovorcSectionType} from "../models/CovorcSectionType.js";
 import multer from 'multer'
 import {CovorcSectionsPictures} from "../models/CovorcSectionsPictures.js";
+import {CovorcController} from "./CovorcController";
 
 const logger = log4js.getLogger()
 
@@ -14,8 +15,26 @@ type CovorcSectionWithFacilities = CovorcSection & {
     facilities: number[];
 }
 
+type GetCovorcSectionsParams = {
+    covorcId: number
+}
+
 @JsonController()
 export class CovorcSectionController {
+    @Get('/covorc_sections')
+    @HttpCode(200)
+    @OnUndefined(404)
+    async getOneByCovorcId(@Body() params: GetCovorcSectionsParams): Promise<CovorcSection[]> {
+        return CovorcSection.findAll({
+            where: {covorcId: params.covorcId},
+            include: [Facilities, CovorcSectionType]
+        }).then(covSections => JSON.stringify(covSections))
+            .catch(ex => {
+                logger.debug(ex);
+                return undefined;
+            })
+    }
+
     @Get('/covorc_sections/:id')
     @HttpCode(200)
     @OnUndefined(400)
