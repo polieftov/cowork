@@ -1,4 +1,15 @@
-import {Body, Delete, Get, HttpCode, JsonController, OnUndefined, Param, Post, UploadedFiles} from 'routing-controllers'
+import {
+    Body,
+    Delete,
+    Get,
+    HttpCode,
+    JsonController,
+    OnUndefined,
+    Param,
+    Post,
+    QueryParam,
+    UploadedFiles
+} from 'routing-controllers'
 import 'reflect-metadata'
 import log4js from "log4js";
 import {CovorcSection, CovorcSection2Facilities} from "../models/CovorcSection.js";
@@ -24,9 +35,9 @@ export class CovorcSectionController {
     @Get('/covorc_sections')
     @HttpCode(200)
     @OnUndefined(404)
-    async getOneByCovorcId(@Body() params: GetCovorcSectionsParams): Promise<CovorcSection[]> {
+    async getOneByCovorcId(@QueryParam("covorcId") covorcId: number): Promise<CovorcSection[]> {
         return CovorcSection.findAll({
-            where: {covorcId: params.covorcId},
+            where: {covorcId: covorcId},
             include: [Facilities, CovorcSectionType]
         }).then(covSections => JSON.stringify(covSections))
             .catch(ex => {
