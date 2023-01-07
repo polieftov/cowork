@@ -41,8 +41,9 @@ export class BookingController {
     @HttpCode(200)
     @OnUndefined(400)
     async createCovorcSection(@Body() booking: Booking) {
-        await Booking.create(booking).then(b => {
-            logger.debug(`create booking ${b.id}`)
+        return await Booking.create(booking).then(b => {
+            logger.debug(`create booking ${b.id}`);
+            return b;
         })
    }
 
