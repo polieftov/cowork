@@ -12,8 +12,8 @@ const logger = log4js.getLogger()
 export class CovorcController {
     @Get('/covorcs/:id')
     async getOne(@Param('id') id: number) {
-        let covorc: Covorc[] = await Covorc.findAll({where: {id: id}});
-        logger.debug(`get covorcs ${covorc.map(c => c.title)}`);
+        let covorc: Covorc = await Covorc.findByPk(id);
+        logger.debug(`get covorc ${covorc.title}`);
         return JSON.stringify(covorc);
     }
 

@@ -26,8 +26,8 @@ const logger = log4js.getLogger();
 let CovorcController = class CovorcController {
     getOne(id) {
         return __awaiter(this, void 0, void 0, function* () {
-            let covorc = yield Covorc.findAll({ where: { id: id } });
-            logger.debug(`get covorcs ${covorc.map(c => c.title)}`);
+            let covorc = yield Covorc.findByPk(id);
+            logger.debug(`get covorc ${covorc.title}`);
             return JSON.stringify(covorc);
         });
     }
