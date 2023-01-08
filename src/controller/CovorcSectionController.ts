@@ -8,6 +8,8 @@ import {
     Param,
     Post,
     QueryParam,
+    Req,
+    Res,
     UploadedFiles
 } from 'routing-controllers'
 import 'reflect-metadata'
@@ -18,7 +20,8 @@ import {Facilities} from "../models/Facilities.js";
 import {CovorcSectionType} from "../models/CovorcSectionType.js";
 import multer from 'multer'
 import {CovorcSectionsPictures} from "../models/CovorcSectionsPictures.js";
-import {CovorcController} from "./CovorcController";
+import * as path from "path";
+import * as express from "express"
 
 const logger = log4js.getLogger()
 
@@ -92,36 +95,47 @@ export class CovorcSectionController {
 
     }
 
-    /**
-     * {
-     *
-     * }
-     */
-    @Post('/covorc_sections/load_photo/:covorcSectionId')
+    @Post('/covorc_sections/photo/:covorcSectionId')
     @HttpCode(200)
     @OnUndefined(400)
     async loadCovorcSectionPhotos(@UploadedFiles("filename", {
                                       options: {
                                           storage: multer.diskStorage({
                                               destination: function (req, file, cb) {
-                                                  cb(null, '/static')
+                                                  cb(null, './static')
                                               },
                                               filename: function (req, file, cb) {
-                                                  cb(null, file.fieldname + '-' + Date.now())
+                                                  let [filename, ext] = file.originalname.split('.')
+                                                  cb(null, `${filename}-${Date.now()}.${ext}`)
                                               }
                                           })
                                       }
                                   }) files: File[],
                                   @Param('covorcSectionId') covorcSectionId: number
     ) {
-        files.map(file => {
-            const picture = CovorcSectionsPictures.build(file.name);
-            picture.set({
+
+        logger.debug(files);
+        return files.map(f => {
+            return CovorcSectionsPictures.create({
+                filename: f['originalname'],
+                path: './static',
                 covorcSectionId: covorcSectionId
             });
-            picture.save()
-        })
+        });
+    }
 
+    @Get('/covorc_sections/photo/:name')
+    async GetFile(@Req() request: any, @Res() response: express.Response, @Param('name') name: string) {
+        const __dirname = path.resolve();
+        let filePath = path.join(__dirname, '/static', name);
+        const sendFilePromise = await new Promise(() => response.sendFile(filePath, ex => {
+            if (ex)
+                logger.debug(ex)
+            else
+                logger.debug('File: ' + filePath)
+        }));
+
+        return response.status(200);
     }
 
     @Delete('/covorc_sections/:id')
