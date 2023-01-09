@@ -11,10 +11,11 @@ const logger = log4js.getLogger()
 @JsonController()
 export class CovorcController {
     @Get('/covorcs/:id')
-    async getOne(@Param('id') id: number) {
-        let covorc: Covorc = await Covorc.findByPk(id);
-        logger.debug(`get covorc ${covorc.title}`);
-        return JSON.stringify(covorc);
+    async getOne(@Param('id') id: number): Promise<CovorcWithFacilities> {
+        return this.getCovorcWithFacilitiesIds(id).then(covorc => {
+            logger.debug(`get covorc ${covorc[0].title}`);
+            return covorc[0];
+        });
     }
 
     @Get('/covorcs')
@@ -72,6 +73,24 @@ export class CovorcController {
         `
         return sequelize.query(query, {type: QueryTypes.SELECT})
     }
+
+    getCovorcWithFacilitiesIds(covorcId: number): Promise<CovorcWithFacilities[]> {
+        const query = `
+        select cov.*, array_agg(distinct f.id) facilities from covorcs cov
+        join covorc_sections cs on cs."covorcId" = cov.id
+        join "CovorcSection2Facilities" cf on cf."covorcSection" = cs.id
+        join facilities f on f.id = cf.facilities
+        where cov.id = :covorc_id
+        group by cov.id 
+        `
+        return sequelize.query(
+            query,
+            {
+                replacements: { covorc_id: covorcId },
+                type: QueryTypes.SELECT
+            }
+        )
+    }
 }
 
 type CovorcToGet = {
@@ -82,4 +101,14 @@ type CovorcToGet = {
     maxPrice: number;
     minPrice: number;
     address: string;
+}
+
+type CovorcWithFacilities = {
+    id: number
+    title: string
+    description: string
+    schedule: string
+    address: string
+    contacts: string
+    facilities: number[]
 }

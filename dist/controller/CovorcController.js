@@ -26,9 +26,10 @@ const logger = log4js.getLogger();
 let CovorcController = class CovorcController {
     getOne(id) {
         return __awaiter(this, void 0, void 0, function* () {
-            let covorc = yield Covorc.findByPk(id);
-            logger.debug(`get covorc ${covorc.title}`);
-            return JSON.stringify(covorc);
+            return this.getCovorcWithFacilitiesIds(id).then(covorc => {
+                logger.debug(`get covorc ${covorc[0].title}`);
+                return covorc[0];
+            });
         });
     }
     getAll() {
@@ -81,6 +82,20 @@ let CovorcController = class CovorcController {
         group by c.id
         `;
         return sequelize.query(query, { type: QueryTypes.SELECT });
+    }
+    getCovorcWithFacilitiesIds(covorcId) {
+        const query = `
+        select cov.*, array_agg(distinct f.id) facilities from covorcs cov
+        join covorc_sections cs on cs."covorcId" = cov.id
+        join "CovorcSection2Facilities" cf on cf."covorcSection" = cs.id
+        join facilities f on f.id = cf.facilities
+        where cov.id = :covorc_id
+        group by cov.id 
+        `;
+        return sequelize.query(query, {
+            replacements: { covorc_id: covorcId },
+            type: QueryTypes.SELECT
+        });
     }
 };
 __decorate([
