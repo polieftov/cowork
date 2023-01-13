@@ -29,10 +29,6 @@ type CovorcSectionWithFacilities = CovorcSection & {
     facilities: number[];
 }
 
-type GetCovorcSectionsParams = {
-    covorcId: number
-}
-
 @JsonController()
 export class CovorcSectionController {
     @Get('/covorc_sections')

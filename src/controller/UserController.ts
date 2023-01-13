@@ -5,6 +5,7 @@ import {User} from '../models/User.js'
 import log4js from "log4js";
 import jsonwebtoken from 'jsonwebtoken'
 import {Op} from "sequelize";
+import {Booking} from "../models/Booking";
 
 const logger = log4js.getLogger()
 
@@ -103,10 +104,15 @@ export class UserController {
   }
 
   @Get('/users/:id')
-  async getOne (@Param('id') id: number) {
-    let user: User[] = await User.findAll({where: {id: id}});
-    logger.debug(`get user ${user.map(u => u.login)}`);
-    return JSON.stringify(user);
+  async getOne (@Param('id') id: number): Promise<User> {
+    let user: User = await User.findByPk(id);
+    logger.debug(`get user ${user.login}`);
+    return user;
+  }
+
+  @Get('/users/bookings/:id')
+  async getBookingsByUserId(@Param('id') id: number): Promise<Booking[]> {
+    return Booking.findAll({where: {userId: id}, order: ['date', 'DESC']});
   }
 
   @Get('/users')

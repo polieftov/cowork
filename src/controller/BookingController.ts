@@ -11,7 +11,7 @@ const logger = log4js.getLogger()
 @JsonController()
 @UseAfter(loggingMiddleware)
 export class BookingController {
-    @Get('/booking/:id')
+    @Get('/bookings/:id')
     @HttpCode(200)
     @OnUndefined(400)
     async getOne(@Param('id') id: number) {
