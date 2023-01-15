@@ -37,7 +37,7 @@ export class CovorcSectionController {
     async getOneByCovorcId(@QueryParam("covorcId") covorcId: number): Promise<CovorcSection[]> {
         return CovorcSection.findAll({
             where: {covorcId: covorcId},
-            include: [Facilities, CovorcSectionType]
+            include: [Facilities, CovorcSectionType, CovorcSectionsPictures]
         }).then(covSections => JSON.stringify(covSections))
             .catch(ex => {
                 logger.debug(ex);

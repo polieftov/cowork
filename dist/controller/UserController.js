@@ -23,6 +23,7 @@ import { User } from '../models/User.js';
 import log4js from "log4js";
 import jsonwebtoken from 'jsonwebtoken';
 import { Op } from "sequelize";
+import { Booking } from "../models/Booking.js";
 const logger = log4js.getLogger();
 //Возвращается при успешной авторизации
 class UserWithJWT extends User {
@@ -101,9 +102,14 @@ let UserController = class UserController {
     }
     getOne(id) {
         return __awaiter(this, void 0, void 0, function* () {
-            let user = yield User.findAll({ where: { id: id } });
-            logger.debug(`get user ${user.map(u => u.login)}`);
-            return JSON.stringify(user);
+            let user = yield User.findByPk(id);
+            logger.debug(`get user ${user.login}`);
+            return user;
+        });
+    }
+    getBookingsByUserId(id) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return Booking.findAll({ where: { userId: id }, order: ['date', 'DESC'] });
         });
     }
     getAll() {
@@ -158,6 +164,10 @@ __decorate([
     Get('/users/:id'),
     __param(0, Param('id'))
 ], UserController.prototype, "getOne", null);
+__decorate([
+    Get('/users/bookings/:id'),
+    __param(0, Param('id'))
+], UserController.prototype, "getBookingsByUserId", null);
 __decorate([
     Get('/users')
 ], UserController.prototype, "getAll", null);

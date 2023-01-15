@@ -5,7 +5,7 @@ import {User} from '../models/User.js'
 import log4js from "log4js";
 import jsonwebtoken from 'jsonwebtoken'
 import {Op} from "sequelize";
-import {Booking} from "../models/Booking";
+import {Booking} from "../models/Booking.js";
 
 const logger = log4js.getLogger()
 
