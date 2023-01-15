@@ -7,7 +7,7 @@ export class Booking extends Model<InferAttributes<Booking>, InferCreationAttrib
     declare id: CreationOptional<number>;
     declare price: number;
     declare hours: number;
-    declare countOfPeoples: number;
+    declare countOfPeople: number;
     declare date: Date;
     declare userId: ForeignKey<User['id']>;
     declare covorcSectionId: ForeignKey<CovorcSection['id']>;
@@ -35,7 +35,7 @@ Booking.init(
             type: DataTypes.INTEGER,
             allowNull: false,
         },
-        countOfPeoples: {
+        countOfPeople: {
             type: DataTypes.INTEGER,
             allowNull: false,
         },
@@ -56,8 +56,40 @@ Booking.init(
     }
 )
 
+export class BookingByHour extends Model {
+    declare id: CreationOptional<number>;
+    declare date: Date;
+    declare bookingId: ForeignKey<Booking['id']>;
+
+    // timestamps!
+    // createdAt can be undefined during creation
+    declare createdAt: CreationOptional<Date>;
+    // updatedAt can be undefined during creation
+    declare updatedAt: CreationOptional<Date>;
+}
+
+BookingByHour.init(
+    {
+        id: {
+            type: DataTypes.INTEGER,
+            autoIncrement: true,
+            primaryKey: true,
+        },
+        date: {
+            type: DataTypes.DATE,
+            allowNull: false
+        }
+    },
+    {
+        sequelize,
+        modelName: 'bookingByHour'
+    }
+)
+
 //user covorcsection
 Booking.belongsTo(CovorcSection, {foreignKey: 'covorcSectionId'});
 CovorcSection.hasMany(Booking);
 Booking.belongsTo(User, {foreignKey: 'userId'});
 User.hasMany(Booking);
+Booking.hasMany(BookingByHour)
+BookingByHour.belongsTo(Booking, {foreignKey: 'bookingId'});
