@@ -76,7 +76,8 @@ let CovorcController = class CovorcController {
     }
     getCovorcs() {
         const query = `
-        select c.id, c.title, c."shortDescription", c.schedule, c.address, max(cs.price) "maxPrice", min(cs.price) "minPrice"
+        select c.id, c.title, c."shortDescription", c."monWorkTime", c."tueWorkTime", c."wedWorkTime", c."thuWorkTime",
+        c."friWorkTime", c."satWorkTime", c."sunWorkTime", c.address, max(cs.price) "maxPrice", min(cs.price) "minPrice"
         from covorcs c
         join covorc_sections cs on c.id = cs."covorcId"
         group by c.id

@@ -16,7 +16,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-import { Body, Delete, Get, HttpCode, JsonController, OnUndefined, Param, Post } from 'routing-controllers';
+import { Body, Delete, Get, HeaderParam, HttpCode, JsonController, OnUndefined, Param, Post } from 'routing-controllers';
 import 'reflect-metadata';
 import bcrypt from 'bcrypt';
 import { User } from '../models/User.js';
@@ -66,6 +66,7 @@ let UserController = class UserController {
             });
         });
     }
+    //результат можно понять по message
     signIn(credentials) {
         return __awaiter(this, void 0, void 0, function* () {
             let user = null;
@@ -98,6 +99,26 @@ let UserController = class UserController {
             userWithJWT.message = "Success";
             return userWithJWT;
             //https://www.topcoder.com/thrive/articles/authentication-and-authorization-in-express-js-api-using-jwt
+        });
+    }
+    authWithJWT(authValue) {
+        return __awaiter(this, void 0, void 0, function* () {
+            if (authValue)
+                return jsonwebtoken.verify(authValue, process.env.API_SECRET, function (err, decode) {
+                    return __awaiter(this, void 0, void 0, function* () {
+                        if (decode)
+                            return User.findByPk(decode.id).then(user => {
+                                return { user: user, exception: undefined };
+                            }).catch(ex => {
+                                logger.debug(ex);
+                                return { exception: ex, user: undefined };
+                            });
+                        else
+                            return { user: undefined, exception: err };
+                    });
+                });
+            else
+                return { exception: 'No JWT Token!', user: undefined };
         });
     }
     getOne(id) {
@@ -160,6 +181,10 @@ __decorate([
     OnUndefined(401),
     __param(0, Body())
 ], UserController.prototype, "signIn", null);
+__decorate([
+    Get('/auth/jwt'),
+    __param(0, HeaderParam("Authorization"))
+], UserController.prototype, "authWithJWT", null);
 __decorate([
     Get('/users/:id'),
     __param(0, Param('id'))

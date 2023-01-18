@@ -1,4 +1,16 @@
-import {Body, Delete, Get, HttpCode, JsonController, OnUndefined, Param, Post} from 'routing-controllers'
+import {
+  Body,
+  BodyParam,
+  Delete,
+  Get, HeaderParam,
+  HttpCode,
+  JsonController,
+  OnUndefined,
+  Param,
+  Post,
+  Req,
+  Res
+} from 'routing-controllers'
 import 'reflect-metadata'
 import bcrypt from 'bcrypt'
 import {User} from '../models/User.js'
@@ -6,6 +18,7 @@ import log4js from "log4js";
 import jsonwebtoken from 'jsonwebtoken'
 import {Op} from "sequelize";
 import {Booking} from "../models/Booking.js";
+import * as express from "express";
 
 const logger = log4js.getLogger()
 
@@ -62,6 +75,7 @@ export class UserController {
     })
   }
 
+  //результат можно понять по message
   @Post('/login')
   @OnUndefined(401)
   async signIn(@Body() credentials: Credentials): Promise<UserWithJWT> {
@@ -101,6 +115,24 @@ export class UserController {
     userWithJWT.message = "Success";
     return userWithJWT
     //https://www.topcoder.com/thrive/articles/authentication-and-authorization-in-express-js-api-using-jwt
+  }
+
+  @Get('/auth/jwt')
+  async authWithJWT(@HeaderParam("Authorization") authValue: string): Promise<AuthWithJWT> {
+    if (authValue)
+      return jsonwebtoken.verify(authValue, process.env.API_SECRET, async function (err, decode) {
+        if (decode)
+          return User.findByPk(decode.id).then(user => {
+            return {user: user, exception: undefined}
+          }).catch(ex => {
+            logger.debug(ex);
+            return {exception: ex, user: undefined}
+          });
+        else
+          return {user: undefined, exception: err}
+      });
+    else
+      return {exception: 'No JWT Token!', user: undefined}
   }
 
   @Get('/users/:id')
@@ -153,4 +185,9 @@ export class UserController {
     });
     logger.debug(`user with id = ${id} was deleted`);
   }
+}
+
+type AuthWithJWT = {
+  user: User
+  exception: string
 }

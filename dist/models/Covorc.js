@@ -16,9 +16,6 @@ Covorc.init({
     description: {
         type: DataTypes.STRING,
     },
-    schedule: {
-        type: DataTypes.STRING,
-    },
     shortDescription: {
         type: DataTypes.STRING,
     },
@@ -34,6 +31,27 @@ Covorc.init({
         type: DataTypes.BOOLEAN,
         allowNull: false,
         defaultValue: false
+    },
+    monWorkTime: {
+        type: DataTypes.STRING
+    },
+    tueWorkTime: {
+        type: DataTypes.STRING
+    },
+    wedWorkTime: {
+        type: DataTypes.STRING
+    },
+    thuWorkTime: {
+        type: DataTypes.STRING
+    },
+    friWorkTime: {
+        type: DataTypes.STRING
+    },
+    satWorkTime: {
+        type: DataTypes.STRING
+    },
+    sunWorkTime: {
+        type: DataTypes.STRING
     },
     createdAt: DataTypes.DATE,
     updatedAt: DataTypes.DATE,

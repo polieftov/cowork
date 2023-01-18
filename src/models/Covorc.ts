@@ -8,11 +8,17 @@ export class Covorc extends Model<InferAttributes<Covorc>, InferCreationAttribut
     declare title: string;
     declare description: string;
     declare shortDescription: string;
-    declare schedule: string;
     declare address: string;
     declare contacts: string;
     declare userId: ForeignKey<User['id']>;
     declare isArchived: boolean;
+    declare monWorkTime: string;
+    declare tueWorkTime: string;
+    declare wedWorkTime: string;
+    declare thuWorkTime: string;
+    declare friWorkTime: string;
+    declare satWorkTime: string;
+    declare sunWorkTime: string;
 
     // timestamps!
     // createdAt can be undefined during creation
@@ -36,9 +42,6 @@ Covorc.init(
         description: {
             type: DataTypes.STRING,
         },
-        schedule: {
-            type: DataTypes.STRING,
-        },
         shortDescription: {
             type: DataTypes.STRING,
         },
@@ -54,6 +57,27 @@ Covorc.init(
             type: DataTypes.BOOLEAN,
             allowNull: false,
             defaultValue: false
+        },
+        monWorkTime: {
+            type: DataTypes.STRING
+        },
+        tueWorkTime: {
+            type: DataTypes.STRING
+        },
+        wedWorkTime: {
+            type: DataTypes.STRING
+        },
+        thuWorkTime: {
+            type: DataTypes.STRING
+        },
+        friWorkTime: {
+            type: DataTypes.STRING
+        },
+        satWorkTime: {
+            type: DataTypes.STRING
+        },
+        sunWorkTime: {
+            type: DataTypes.STRING
         },
         createdAt: DataTypes.DATE,
         updatedAt: DataTypes.DATE,
