@@ -24,28 +24,40 @@ const logger = log4js.getLogger()
 @JsonController()
 @UseAfter(loggingMiddleware)
 export class BookingController {
+    //Date format 15.01.2023,00:00:00
     @Get('/bookings/free')
     async getBookingsByCovorcSectionsAndDatePeriod(
         @QueryParam("covorcSection") covorcSectionId: number,
-        @QueryParam("beginDate") beginDate: Date,
-        @QueryParam("endDate") endDate: Date
+        @QueryParam("beginDate") beginDate: string,
+        @QueryParam("endDate") endDate: string
     ): Promise<BookingsByHour[]> {
-        const query = `select bbh."date", to_char(bbh."date", 'dd') "day", to_char(bbh."date", 'hh24') "hour", 
+        const query = `select bbh."date", to_char(bbh."date", 'dd')::numeric "day", to_char(bbh."date", 'hh24')::numeric "hour", 
          sum(b."countOfPeople") countOfPeople, max(cs."placesCount") as placesCount,
          max(cs."placesCount") - sum(b."countOfPeople") avaiblePlaces
          from "bookingByHours" bbh
          join bookings b on b.id = bbh."bookingId"
          join covorc_sections cs on cs.id = b."covorcSectionId"
-         where cs.id = ${covorcSectionId} and bbh."date" between ${beginDate} and ${endDate} 
+         where cs.id = ${covorcSectionId} and bbh."date" between '${beginDate}' and '${endDate}' 
          group by "day", "hour", bbh."date"
          order by "day", "hour", bbh."date"`
 
-        return sequelize.query(
+        const res: Promise<BookingsByHour[]> = sequelize.query(
             query,
             {
                 type: QueryTypes.SELECT
             }
-        )
+        ).then((seq: BookingsByHour[]) => {
+            return seq.map(booking => {
+                booking.hour = Number(booking.hour) + 5;
+                if (booking.hour >= 24)
+                    booking.day = Number(booking.day) + 1;
+                booking.date.setHours(booking.date.getHours() + 5);
+                return booking;
+            })
+        })
+
+
+        return res
     }
 
     @Get('/bookings/:id')
@@ -63,8 +75,6 @@ export class BookingController {
         logger.debug(`get all bookings`);
         return JSON.stringify(await Booking.findAll({include: [CovorcSection, User]}));
     }
-
-
 
     /**
      * {
