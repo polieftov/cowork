@@ -13,11 +13,11 @@ import {
 import 'reflect-metadata'
 import log4js from "log4js";
 import {CovorcSection} from "../models/CovorcSection.js";
-import {Booking} from "../models/Booking.js";
+import {Booking, BookingByHour} from "../models/Booking.js";
 import {User} from "../models/User.js";
 import {loggingMiddleware} from "./Middleware/Auth.js";
 import {sequelize} from "../models/dbconnection.js";
-import {QueryTypes} from "sequelize";
+import {ForeignKey, QueryTypes} from "sequelize";
 
 const logger = log4js.getLogger()
 
@@ -80,8 +80,8 @@ export class BookingController {
      * {
      *     price: 1,
      *     hours: 1,
-     *     countOfPeoples: 1,
-     *     date: "2012-04-23T18:25:43.511Z",
+     *     countOfPeople: 1,
+     *     date: "2012-04-23T18:25:43.511",
      *     userId: 1,
      *     covorcSectionId: 1
      * }
@@ -90,10 +90,25 @@ export class BookingController {
     @HttpCode(200)
     @OnUndefined(400)
     async createCovorcSection(@Body() booking: Booking) {
-        return await Booking.create(booking).then(b => {
+        const createdBooking = await Booking.create(booking).then(b => {
             logger.debug(`create booking ${b.id}`);
             return b;
-        })
+        });
+
+        let bookingDate = createdBooking.date;
+        let bookingByHourDates = [];
+        for (let i = createdBooking.hours; i > 0; i--) {
+            bookingByHourDates.push(bookingDate.setHours(bookingDate.getHours() + 1));
+        }
+
+        bookingByHourDates.map(bookingByHourDate => {
+            return BookingByHour.create({
+                date: bookingByHourDate,
+                bookingId: createdBooking.id
+            })
+        });
+
+        return createdBooking;
    }
 
     @Delete('/bookings/:id')
