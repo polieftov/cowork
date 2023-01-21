@@ -9,12 +9,24 @@ var __param = (this && this.__param) || function (paramIndex, decorator) {
 };
 import { Controller, Get, Param } from 'routing-controllers';
 import 'reflect-metadata';
+import MultiGeocoder from 'multi-geocoder';
 let TestController = class TestController {
     getOne(id) {
         return 'This action returns test #' + id;
     }
     getAll() {
-        return 'All tests';
+        const geocoder = new MultiGeocoder({ provider: 'yandex', coordorder: 'latlong' }), provider = geocoder.getProvider();
+        const getRequestParams = provider.getRequestParams;
+        provider.getRequestParams = function () {
+            const result = getRequestParams.apply(provider, arguments);
+            result.key = '7d804608-524d-4975-b71b-73e84da83c80';
+            return result;
+        };
+        return geocoder.geocode([{ address: 'Moscow' }, { address: 'New York' }, { address: 'Paris' }, { address: 'London' }])
+            .then(function (res) {
+            console.log(res);
+            return res;
+        });
     }
 };
 __decorate([

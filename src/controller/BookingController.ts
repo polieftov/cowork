@@ -25,11 +25,12 @@ const logger = log4js.getLogger()
 @UseAfter(loggingMiddleware)
 export class BookingController {
     //Date format 15.01.2023,00:00:00
-    @Get('/bookings/free')
+    @Get('/bookings/booked')
     async getBookingsByCovorcSectionsAndDatePeriod(
         @QueryParam("covorcSection") covorcSectionId: number,
         @QueryParam("beginDate") beginDate: string,
-        @QueryParam("endDate") endDate: string
+        @QueryParam("endDate") endDate: string,
+        @QueryParam("countOfPeople") countOfPeople: number
     ): Promise<BookingsByHour[]> {
         const query = `select bbh."date", to_char(bbh."date", 'dd')::numeric "day", to_char(bbh."date", 'hh24')::numeric "hour", 
          sum(b."countOfPeople") countOfPeople, max(cs."placesCount") as placesCount,
@@ -37,8 +38,9 @@ export class BookingController {
          from "bookingByHours" bbh
          join bookings b on b.id = bbh."bookingId"
          join covorc_sections cs on cs.id = b."covorcSectionId"
-         where cs.id = ${covorcSectionId} and bbh."date" between '${beginDate}' and '${endDate}' 
+         where cs.id = ${covorcSectionId} and bbh."date" between '${beginDate}' and '${endDate}'
          group by "day", "hour", bbh."date"
+         having max(cs."placesCount") - sum(b."countOfPeople") < ${countOfPeople}
          order by "day", "hour", bbh."date"`
 
         const res: Promise<BookingsByHour[]> = sequelize.query(
@@ -58,15 +60,6 @@ export class BookingController {
 
 
         return res
-    }
-
-    @Get('/bookings/:id')
-    @HttpCode(200)
-    @OnUndefined(400)
-    async getOne(@Param('id') id: number) {
-        return JSON.stringify(await Booking.findByPk(id).then(b => {
-            logger.debug(`get booking ${b.id}`);
-        }));
     }
 
     @Get('/bookings')

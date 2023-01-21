@@ -2,9 +2,9 @@ import {Body, Delete, Get, HttpCode, JsonController, OnUndefined, Param, Post, P
 import 'reflect-metadata'
 import log4js from "log4js";
 import {Covorc} from "../models/Covorc.js";
-import {CovorcSection} from "../models/CovorcSection.js";
 import {sequelize} from "../models/dbconnection.js";
 import {QueryTypes} from "sequelize";
+import MultiGeocoder from 'multi-geocoder'
 
 const logger = log4js.getLogger()
 
@@ -102,6 +102,10 @@ type CovorcToGet = {
     maxPrice: number;
     minPrice: number;
     address: string;
+}
+
+type CovorcToGetWithGeo = CovorcToGet & {
+    geo: string[]
 }
 
 type CovorcWithFacilities = {

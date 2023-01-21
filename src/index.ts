@@ -37,7 +37,7 @@ function initCovorcSections(): Promise<void> {
                 covorcId: covorc.id,
                 description: "секция с опенспейсом",
                 sectionTypeId: 1,
-                placesCount: 25,
+                placesCount: 5,
                 price: 100
             }
         }).then((covorcSection) => {
@@ -52,7 +52,7 @@ function initCovorcSections(): Promise<void> {
                     covorcId: covorc.id,
                     description: "переговорка местная",
                     sectionTypeId: 2,
-                    placesCount: 15,
+                    placesCount: 2,
                     price: 200,
                 }
             }).then((covorcSection) => {
@@ -67,7 +67,7 @@ function initCovorcSections(): Promise<void> {
                     covorcId: covorc.id,
                     description: "элитный опенспайс",
                     sectionTypeId: 1,
-                    placesCount: 15,
+                    placesCount: 3,
                     price: 500,
                 }
             }).then((covorcSection) => {
@@ -131,7 +131,7 @@ function initCovorcs(): Promise<void> {
                 friWorkTime: "10-21",
                 satWorkTime: "10-21",
                 sunWorkTime: "10-21",
-                address: "г. Екатеринбург ул. Ленина 1 к2",
+                address: "Екатеринбург, Мира, 32",
                 contacts: "Тел 89213492131",
                 userId: user.id,
             }
@@ -150,7 +150,7 @@ function initCovorcs(): Promise<void> {
                     friWorkTime: "9-21",
                     satWorkTime: "12-21",
                     sunWorkTime: "12-21",
-                    address: "г. Екатеринбург ул. Ленина 111",
+                    address: "Екатеринбург, Мира, 19",
                     contacts: "Тел 8921349777",
                     userId: user.id,
                 }
@@ -200,7 +200,7 @@ function initBookings(): void {
         BookingByHour.findOrCreate({
             where: {
                 bookingId: 1,
-                date: new Date('2023-01-15T19:00:00')
+                date: new Date('2023-01-21T19:00:00')
             }
         })
     ).then(() =>
@@ -209,7 +209,7 @@ function initBookings(): void {
                 price: 100,
                 hours: 1,
                 countOfPeople: 1,
-                date: new Date('2023-01-15T17:00:00'),
+                date: new Date('2023-01-21T17:00:00'),
                 userId: 1,
                 covorcSectionId: 1
             }
@@ -218,7 +218,7 @@ function initBookings(): void {
         BookingByHour.findOrCreate({
             where: {
                 bookingId: 2,
-                date: new Date('2023-01-15T17:00:00')
+                date: new Date('2023-01-21T17:00:00')
             }
         })
     ).then(() =>
@@ -227,7 +227,7 @@ function initBookings(): void {
                 price: 200,
                 hours: 2,
                 countOfPeople: 1,
-                date: new Date('2023-01-15T15:00:00'),
+                date: new Date('2023-01-21T15:00:00'),
                 userId: 1,
                 covorcSectionId: 1
             }
@@ -236,13 +236,13 @@ function initBookings(): void {
             BookingByHour.findOrCreate({
                 where: {
                     bookingId: 3,
-                    date: new Date('2023-01-15T16:00:00')
+                    date: new Date('2023-01-21T16:00:00')
                 }
             });
             BookingByHour.findOrCreate({
                 where: {
                     bookingId: 1,
-                    date: new Date('2023-01-15T15:00:00')
+                    date: new Date('2023-01-21T15:00:00')
                 }
             });
         }
@@ -252,7 +252,7 @@ function initBookings(): void {
                 price: 200,
                 hours: 1,
                 countOfPeople: 1,
-                date: new Date('2023-01-15T17:00:00'),
+                date: new Date('2023-01-21T17:00:00'),
                 userId: 2,
                 covorcSectionId: 1
             }
@@ -261,7 +261,7 @@ function initBookings(): void {
             BookingByHour.findOrCreate({
                 where: {
                     bookingId: 4,
-                    date: new Date('2023-01-15T17:00:00')
+                    date: new Date('2023-01-21T17:00:00')
                 }
             });
         }
@@ -271,7 +271,7 @@ function initBookings(): void {
                 price: 100,
                 hours: 1,
                 countOfPeople: 1,
-                date: new Date('2023-01-15T17:00:00'),
+                date: new Date('2023-01-21T17:00:00'),
                 userId: 3,
                 covorcSectionId: 1
             }
@@ -280,7 +280,7 @@ function initBookings(): void {
             BookingByHour.findOrCreate({
                 where: {
                     bookingId: 5,
-                    date: new Date('2023-01-15T17:00:00')
+                    date: new Date('2023-01-21T17:00:00')
                 }
             });
         }
@@ -290,7 +290,7 @@ function initBookings(): void {
                 price: 2000,
                 hours: 4,
                 countOfPeople: 5,
-                date: new Date('2023-01-15T13:00:00'),
+                date: new Date('2023-01-21T13:00:00'),
                 userId: 3,
                 covorcSectionId: 1
             }
@@ -299,29 +299,111 @@ function initBookings(): void {
             BookingByHour.findOrCreate({
                 where: {
                     bookingId: 6,
-                    date: new Date('2023-01-15T13:00:00')
+                    date: new Date('2023-01-21T13:00:00')
                 }
             });
             BookingByHour.findOrCreate({
                 where: {
                     bookingId: 6,
-                    date: new Date('2023-01-15T14:00:00')
+                    date: new Date('2023-01-21T14:00:00')
                 }
             });
             BookingByHour.findOrCreate({
                 where: {
                     bookingId: 6,
-                    date: new Date('2023-01-15T15:00:00')
+                    date: new Date('2023-01-21T15:00:00')
                 }
             });
             BookingByHour.findOrCreate({
                 where: {
                     bookingId: 6,
-                    date: new Date('2023-01-15T16:00:00')
+                    date: new Date('2023-01-21T16:00:00')
                 }
             });
         }
-    ).catch(ex => console.log(ex));
+    ).then(() => Booking.findOrCreate({
+        where: {
+            price: 100,
+            hours: 12,
+            countOfPeople: 5,
+            date: new Date('2023-01-23T08:00:00'),
+            userId: 1,
+            covorcSectionId: 1
+        }
+    }).then(() => {
+        BookingByHour.findOrCreate({
+            where: {
+                bookingId: 1,
+                date: new Date('2023-01-23T08:00:00')
+            }
+        });
+        BookingByHour.findOrCreate({
+            where: {
+                bookingId: 1,
+                date: new Date('2023-01-23T09:00:00')
+            }
+        });
+        BookingByHour.findOrCreate({
+            where: {
+                bookingId: 1,
+                date: new Date('2023-01-23T10:00:00')
+            }
+        });
+        BookingByHour.findOrCreate({
+            where: {
+                bookingId: 1,
+                date: new Date('2023-01-23T11:00:00')
+            }
+        });
+        BookingByHour.findOrCreate({
+            where: {
+                bookingId: 1,
+                date: new Date('2023-01-23T12:00:00')
+            }
+        });
+        BookingByHour.findOrCreate({
+            where: {
+                bookingId: 1,
+                date: new Date('2023-01-23T13:00:00')
+            }
+        });
+        BookingByHour.findOrCreate({
+            where: {
+                bookingId: 1,
+                date: new Date('2023-01-23T14:00:00')
+            }
+        });
+        BookingByHour.findOrCreate({
+            where: {
+                bookingId: 1,
+                date: new Date('2023-01-23T15:00:00')
+            }
+        });
+        BookingByHour.findOrCreate({
+            where: {
+                bookingId: 1,
+                date: new Date('2023-01-23T16:00:00')
+            }
+        });
+        BookingByHour.findOrCreate({
+            where: {
+                bookingId: 1,
+                date: new Date('2023-01-23T17:00:00')
+            }
+        });
+        BookingByHour.findOrCreate({
+            where: {
+                bookingId: 1,
+                date: new Date('2023-01-23T18:00:00')
+            }
+        });
+        BookingByHour.findOrCreate({
+            where: {
+                bookingId: 1,
+                date: new Date('2023-01-23T19:00:00')
+            }
+        });
+    })).catch(ex => console.log(ex));
 }
 
 sequelize.sync({alter: true, force: true}).catch((reason) => console.log(reason)).then(() => {
