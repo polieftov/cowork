@@ -5,6 +5,7 @@ import {Covorc} from "../models/Covorc.js";
 import {sequelize} from "../models/dbconnection.js";
 import {QueryTypes} from "sequelize";
 import MultiGeocoder from 'multi-geocoder'
+import {Covorc2CovorcSection, CovorcSection, CovorcSection2Facilities} from "../models/CovorcSection.js";
 
 const logger = log4js.getLogger()
 
@@ -32,16 +33,53 @@ export class CovorcController {
      *     shortDescription: "",
      *     address: "",
      *     contacts: "",
-     *     userId: 1
+     *     userId: 1,
+     *     covorcSections: [{
+     *              description: "",
+     *              sectionTypeId: 1,
+     *              placesCount: 1,
+     *              price: 1,
+     *              facilities: [1,2,3]
+     *     }]
      * }
+     *
+     *
+     *
      */
     @Post('/covorcs')
     @HttpCode(200)
     @OnUndefined(500)
-    async createCovorc(@Body() covorc: Covorc) {
-        return await Covorc.create(covorc).then(c =>
-            console.log(c.title + " создан")
-        );
+    async createCovorc(@Body() covorc: CovorcWithSectionsToCreate) {
+        return await Covorc.create(covorc, {
+            include: [{
+                association: Covorc2CovorcSection,
+                as: 'covorcSections'
+            }]
+        }).then(c => {
+            const createdCovorcSections: CovorcSectionWithFacilities[] = c.dataValues['covorcSections']
+            const covorcSectionsObj = covorc.covorcSections
+
+            createdCovorcSections.forEach(created => {
+                created.facilities = covorcSectionsObj.find(covSec => {
+                    return covSec.description === created.description && covSec.placesCount === created.placesCount &&
+                        covSec.price === created.price && covSec.sectionTypeId === created.sectionTypeId;
+                }).facilities;
+            });
+
+            if (createdCovorcSections) {
+                createdCovorcSections.forEach(covorcSection => {
+                    logger.debug(covorcSection.facilities)
+                    if (covorcSection.facilities)
+                        covorcSection.facilities.map(facId => {
+                            CovorcSection2Facilities.create({
+                                covorcSection: covorcSection.id,
+                                facilities: facId
+                            });
+                        });
+                });
+            }
+            logger.debug(c.title + " создан");
+        }).catch(ex => logger.info(ex));
     }
 
     @Put('/covorcs/:id')
@@ -55,7 +93,7 @@ export class CovorcController {
     }
 
     @Delete('/covorcs/:id')
-    async deleteOne (@Param('id') id: number) {
+    async deleteOne(@Param('id') id: number) {
         await Covorc.destroy({
             where: {
                 id: id
@@ -87,11 +125,19 @@ export class CovorcController {
         return sequelize.query(
             query,
             {
-                replacements: { covorc_id: covorcId },
+                replacements: {covorc_id: covorcId},
                 type: QueryTypes.SELECT
             }
         )
     }
+}
+
+type CovorcSectionWithFacilities = CovorcSection & {
+    facilities: number[];
+}
+
+type CovorcWithSectionsToCreate = Covorc & {
+    covorcSections: CovorcSectionWithFacilities[]
 }
 
 type CovorcToGet = {

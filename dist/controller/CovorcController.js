@@ -22,6 +22,7 @@ import log4js from "log4js";
 import { Covorc } from "../models/Covorc.js";
 import { sequelize } from "../models/dbconnection.js";
 import { QueryTypes } from "sequelize";
+import { Covorc2CovorcSection, CovorcSection2Facilities } from "../models/CovorcSection.js";
 const logger = log4js.getLogger();
 let CovorcController = class CovorcController {
     getOne(id) {
@@ -46,12 +47,49 @@ let CovorcController = class CovorcController {
      *     shortDescription: "",
      *     address: "",
      *     contacts: "",
-     *     userId: 1
+     *     userId: 1,
+     *     covorcSections: [{
+     *              description: "",
+     *              sectionTypeId: 1,
+     *              placesCount: 1,
+     *              price: 1,
+     *              facilities: [1,2,3]
+     *     }]
      * }
+     *
+     *
+     *
      */
     createCovorc(covorc) {
         return __awaiter(this, void 0, void 0, function* () {
-            return yield Covorc.create(covorc).then(c => console.log(c.title + " создан"));
+            return yield Covorc.create(covorc, {
+                include: [{
+                        association: Covorc2CovorcSection,
+                        as: 'covorcSections'
+                    }]
+            }).then(c => {
+                const createdCovorcSections = c.dataValues['covorcSections'];
+                const covorcSectionsObj = covorc.covorcSections;
+                createdCovorcSections.forEach(created => {
+                    created.facilities = covorcSectionsObj.find(covSec => {
+                        return covSec.description === created.description && covSec.placesCount === created.placesCount &&
+                            covSec.price === created.price && covSec.sectionTypeId === created.sectionTypeId;
+                    }).facilities;
+                });
+                if (createdCovorcSections) {
+                    createdCovorcSections.forEach(covorcSection => {
+                        logger.debug(covorcSection.facilities);
+                        if (covorcSection.facilities)
+                            covorcSection.facilities.map(facId => {
+                                CovorcSection2Facilities.create({
+                                    covorcSection: covorcSection.id,
+                                    facilities: facId
+                                });
+                            });
+                    });
+                }
+                logger.debug(c.title + " создан");
+            }).catch(ex => logger.info(ex));
         });
     }
     updateCovorc(id, covorc) {

@@ -45,7 +45,7 @@ export const CovorcSection2Facilities = sequelize.define('CovorcSection2Faciliti
         type: DataTypes.INTEGER,
     }
 });
-Covorc.hasMany(CovorcSection);
+export const Covorc2CovorcSection = Covorc.hasMany(CovorcSection, { as: 'covorcSections' });
 CovorcSection.belongsTo(Covorc, { foreignKey: 'covorcId' });
 CovorcSectionType.hasMany(CovorcSection);
 CovorcSection.belongsTo(CovorcSectionType, { foreignKey: 'sectionTypeId' });
