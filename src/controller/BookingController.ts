@@ -83,7 +83,7 @@ export class BookingController {
     @HttpCode(200)
     @OnUndefined(400)
     async createCovorcSection(@Body() booking: Booking) {
-        const createdBooking = await Booking.create(booking).then(b => {
+        const createdBooking: Booking = await Booking.create(booking).then(b => {
             logger.debug(`create booking ${b.id}`);
             return b;
         });
@@ -91,14 +91,15 @@ export class BookingController {
         let bookingDate = createdBooking.date;
         let bookingByHourDates = [];
         for (let i = createdBooking.hours; i > 0; i--) {
-            bookingByHourDates.push(bookingDate.setHours(bookingDate.getHours() + 1));
+            bookingByHourDates.push(new Date(bookingDate));
+            bookingDate.setHours(bookingDate.getHours() + 1);
         }
 
         bookingByHourDates.map(bookingByHourDate => {
             return BookingByHour.create({
                 date: bookingByHourDate,
                 bookingId: createdBooking.id
-            })
+            }).catch(ex => logger.info(ex))
         });
 
         return createdBooking;
