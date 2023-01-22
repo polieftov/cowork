@@ -94,7 +94,7 @@ export class CovorcSectionController {
     @Post('/covorc_sections/photo/:covorcSectionId')
     @HttpCode(200)
     @OnUndefined(400)
-    async loadCovorcSectionPhotos(@UploadedFiles("filename", {
+    async loadCovorcSectionPhotos(@UploadedFiles("files", {
                                       options: {
                                           storage: multer.diskStorage({
                                               destination: function (req, file, cb) {
@@ -118,6 +118,28 @@ export class CovorcSectionController {
                 covorcSectionId: covorcSectionId
             });
         });
+    }
+
+    @Post('/covorc_sections/load_photos/')
+    @HttpCode(200)
+    @OnUndefined(400)
+    async loadPhotos(@UploadedFiles("files", {
+                                      options: {
+                                          storage: multer.diskStorage({
+                                              destination: function (req, file, cb) {
+                                                  cb(null, './static')
+                                              },
+                                              filename: function (req, file, cb) {
+                                                  let [filename, ext] = file.originalname.split('.')
+                                                  cb(null, `${filename}-${Date.now()}.${ext}`)
+                                              }
+                                          })
+                                      }
+                                  }) files: File[]
+    ) {
+
+        logger.debug(files);
+        return files.map(f => f['originalName'])
     }
 
     @Get('/covorc_sections/photo/:name')

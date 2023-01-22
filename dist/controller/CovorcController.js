@@ -16,13 +16,15 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-import { Body, Delete, Get, HttpCode, JsonController, OnUndefined, Param, Post, Put } from 'routing-controllers';
+import { Body, Delete, Get, HttpCode, JsonController, OnUndefined, Param, Post, Put, UploadedFiles } from 'routing-controllers';
 import 'reflect-metadata';
 import log4js from "log4js";
 import { Covorc } from "../models/Covorc.js";
 import { sequelize } from "../models/dbconnection.js";
 import { QueryTypes } from "sequelize";
 import { Covorc2CovorcSection, CovorcSection2Facilities } from "../models/CovorcSection.js";
+import multer from 'multer';
+import { CovorcSectionsPictures } from "../models/CovorcSectionsPictures.js";
 const logger = log4js.getLogger();
 let CovorcController = class CovorcController {
     getOne(id) {
@@ -57,10 +59,10 @@ let CovorcController = class CovorcController {
      *     }]
      * }
      *
-     *
+     * return CovorcSectionWithFacilities[] созданные секции
      *
      */
-    createCovorc(covorc) {
+    createCovorc(covorc, files) {
         return __awaiter(this, void 0, void 0, function* () {
             return yield Covorc.create(covorc, {
                 include: [{
@@ -70,10 +72,22 @@ let CovorcController = class CovorcController {
             }).then(c => {
                 const createdCovorcSections = c.dataValues['covorcSections'];
                 const covorcSectionsObj = covorc.covorcSections;
+                //загружаем файлы
+                covorcSectionsObj.forEach(covSec => covSec['files'].map(f => {
+                    const createId = createdCovorcSections.find(cs => {
+                        return cs.description === covSec.description && covSec.placesCount == cs.placesCount &&
+                            cs.price == covSec.price && covSec.sectionTypeId === cs.sectionTypeId;
+                    }).id;
+                    return CovorcSectionsPictures.create({
+                        filename: f,
+                        path: './static',
+                        covorcSectionId: createId
+                    });
+                }));
                 createdCovorcSections.forEach(created => {
                     created.facilities = covorcSectionsObj.find(covSec => {
-                        return covSec.description === created.description && covSec.placesCount === created.placesCount &&
-                            covSec.price === created.price && covSec.sectionTypeId === created.sectionTypeId;
+                        return covSec.description == created.description && covSec.placesCount == created.placesCount &&
+                            covSec.price == created.price && covSec.sectionTypeId == created.sectionTypeId;
                     }).facilities;
                 });
                 if (createdCovorcSections) {
@@ -89,6 +103,7 @@ let CovorcController = class CovorcController {
                     });
                 }
                 logger.debug(c.title + " создан");
+                return createdCovorcSections;
             }).catch(ex => logger.info(ex));
         });
     }
@@ -148,7 +163,20 @@ __decorate([
     Post('/covorcs'),
     HttpCode(200),
     OnUndefined(500),
-    __param(0, Body())
+    __param(0, Body()),
+    __param(1, UploadedFiles("files", {
+        options: {
+            storage: multer.diskStorage({
+                destination: function (req, file, cb) {
+                    cb(null, './static');
+                },
+                filename: function (req, file, cb) {
+                    let [filename, ext] = file.originalname.split('.');
+                    cb(null, `${filename}-${Date.now()}.${ext}`);
+                }
+            })
+        }
+    }))
 ], CovorcController.prototype, "createCovorc", null);
 __decorate([
     Put('/covorcs/:id'),

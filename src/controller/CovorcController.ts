@@ -1,4 +1,15 @@
-import {Body, Delete, Get, HttpCode, JsonController, OnUndefined, Param, Post, Put} from 'routing-controllers'
+import {
+    Body,
+    Delete,
+    Get,
+    HttpCode,
+    JsonController,
+    OnUndefined,
+    Param,
+    Post,
+    Put,
+    UploadedFiles
+} from 'routing-controllers'
 import 'reflect-metadata'
 import log4js from "log4js";
 import {Covorc} from "../models/Covorc.js";
@@ -6,7 +17,8 @@ import {sequelize} from "../models/dbconnection.js";
 import {QueryTypes} from "sequelize";
 import MultiGeocoder from 'multi-geocoder'
 import {Covorc2CovorcSection, CovorcSection, CovorcSection2Facilities} from "../models/CovorcSection.js";
-
+import multer from 'multer'
+import {CovorcSectionsPictures} from "../models/CovorcSectionsPictures.js";
 const logger = log4js.getLogger()
 
 @JsonController()
@@ -43,13 +55,28 @@ export class CovorcController {
      *     }]
      * }
      *
-     *
+     * return CovorcSectionWithFacilities[] созданные секции
      *
      */
     @Post('/covorcs')
     @HttpCode(200)
     @OnUndefined(500)
-    async createCovorc(@Body() covorc: CovorcWithSectionsToCreate) {
+    async createCovorc(
+        @Body() covorc: CovorcWithSectionsToCreate,
+        @UploadedFiles("files", {
+            options: {
+                storage: multer.diskStorage({
+                    destination: function (req, file, cb) {
+                        cb(null, './static')
+                    },
+                    filename: function (req, file, cb) {
+                        let [filename, ext] = file.originalname.split('.')
+                        cb(null, `${filename}-${Date.now()}.${ext}`)
+                    }
+                })
+            }
+        }) files: File[]
+    ): Promise<CovorcSectionWithFacilities[] | void> {
         return await Covorc.create(covorc, {
             include: [{
                 association: Covorc2CovorcSection,
@@ -59,10 +86,27 @@ export class CovorcController {
             const createdCovorcSections: CovorcSectionWithFacilities[] = c.dataValues['covorcSections']
             const covorcSectionsObj = covorc.covorcSections
 
+
+
+            //загружаем файлы
+            covorcSectionsObj.forEach(covSec => covSec['files'].map(f => {
+                const createId = createdCovorcSections.find(cs => {
+                    return cs.description === covSec.description && covSec.placesCount == cs.placesCount &&
+                    cs.price == covSec.price && covSec.sectionTypeId === cs.sectionTypeId;
+                }).id
+                return CovorcSectionsPictures.create({
+                    filename: f,
+                    path: './static',
+                    covorcSectionId: createId
+                });
+            })
+            )
+
+
             createdCovorcSections.forEach(created => {
                 created.facilities = covorcSectionsObj.find(covSec => {
-                    return covSec.description === created.description && covSec.placesCount === created.placesCount &&
-                        covSec.price === created.price && covSec.sectionTypeId === created.sectionTypeId;
+                    return covSec.description == created.description && covSec.placesCount == created.placesCount &&
+                        covSec.price == created.price && covSec.sectionTypeId == created.sectionTypeId;
                 }).facilities;
             });
 
@@ -79,6 +123,8 @@ export class CovorcController {
                 });
             }
             logger.debug(c.title + " создан");
+            return createdCovorcSections
+
         }).catch(ex => logger.info(ex));
     }
 
@@ -130,6 +176,11 @@ export class CovorcController {
             }
         )
     }
+}
+
+type CreateCovorcResp = {
+    covorc: Covorc,
+    covorcSections: CovorcSection[]
 }
 
 type CovorcSectionWithFacilities = CovorcSection & {
