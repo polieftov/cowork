@@ -101,8 +101,7 @@ export class CovorcSectionController {
                                                   cb(null, './static')
                                               },
                                               filename: function (req, file, cb) {
-                                                  let [filename, ext] = file.originalname.split('.')
-                                                  cb(null, `${filename}-${Date.now()}.${ext}`)
+                                                  cb(null, file.originalname)
                                               }
                                           })
                                       }
@@ -130,8 +129,7 @@ export class CovorcSectionController {
                                                   cb(null, './static')
                                               },
                                               filename: function (req, file, cb) {
-                                                  let [filename, ext] = file.originalname.split('.')
-                                                  cb(null, `${filename}-${Date.now()}.${ext}`)
+                                                  cb(null, file.originalname)
                                               }
                                           })
                                       }

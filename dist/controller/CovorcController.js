@@ -130,21 +130,24 @@ let CovorcController = class CovorcController {
     getCovorcs() {
         const query = `
         select c.id, c.title, c."shortDescription", c."monWorkTime", c."tueWorkTime", c."wedWorkTime", c."thuWorkTime",
-        c."friWorkTime", c."satWorkTime", c."sunWorkTime", c.address, max(cs.price) "maxPrice", min(cs.price) "minPrice"
+        c."friWorkTime", c."satWorkTime", c."sunWorkTime", c.address, max(cs.price) "maxPrice", min(cs.price) "minPrice",
+        array_agg(distinct csp.filename) photos
         from covorcs c
         join covorc_sections cs on c.id = cs."covorcId"
+        left join covorc_section_pictures csp on csp."covorcSectionId" = cs.id
         group by c.id
         `;
         return sequelize.query(query, { type: QueryTypes.SELECT });
     }
     getCovorcWithFacilitiesIds(covorcId) {
         const query = `
-        select cov.*, array_agg(distinct f.id) facilities from covorcs cov
+        select cov.*, array_agg(distinct f.id) facilities, array_agg(distinct csp.filename) photos from covorcs cov
         join covorc_sections cs on cs."covorcId" = cov.id
         join "CovorcSection2Facilities" cf on cf."covorcSection" = cs.id
         join facilities f on f.id = cf.facilities
+        left join covorc_section_pictures csp on csp."covorcSectionId" = cs.id
         where cov.id = :covorc_id
-        group by cov.id 
+        group by cov.id
         `;
         return sequelize.query(query, {
             replacements: { covorc_id: covorcId },
