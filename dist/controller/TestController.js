@@ -9,11 +9,14 @@ var __param = (this && this.__param) || function (paramIndex, decorator) {
 };
 import { Get, JsonController, Param, QueryParam } from 'routing-controllers';
 import 'reflect-metadata';
+import log4js from "log4js";
+const logger = log4js.getLogger();
 let TestController = class TestController {
     getOne(id) {
         return 'This action returns test #' + id;
     }
     getAll(fir, sec, th) {
+        logger.warn(fir + sec + th);
         return {
             fir: fir,
             sec: sec,

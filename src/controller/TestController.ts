@@ -1,7 +1,8 @@
 import {Controller, Get, JsonController, Param, QueryParam} from 'routing-controllers'
 import 'reflect-metadata'
 import MultiGeocoder from 'multi-geocoder'
-import {logger} from "sequelize/types/utils/logger";
+import log4js from "log4js";
+const logger = log4js.getLogger()
 
 @JsonController()
 export class TestController {

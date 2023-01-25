@@ -16,7 +16,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-import { Body, Delete, Get, HttpCode, JsonController, OnUndefined, Param, Post, Put, UploadedFiles } from 'routing-controllers';
+import { Body, Delete, Get, HttpCode, JsonController, OnUndefined, Param, Post, Put, QueryParam, UploadedFiles } from 'routing-controllers';
 import 'reflect-metadata';
 import log4js from "log4js";
 import { Covorc } from "../models/Covorc.js";
@@ -35,10 +35,10 @@ let CovorcController = class CovorcController {
             });
         });
     }
-    getAll() {
+    getAll(titleFilter) {
         return __awaiter(this, void 0, void 0, function* () {
             logger.debug(`get all covorcs`);
-            return JSON.stringify(yield this.getCovorcs());
+            return this.getCovorcs(titleFilter);
         });
     }
     /**
@@ -127,7 +127,13 @@ let CovorcController = class CovorcController {
             logger.debug(`Covorc with id = ${id} was deleted`);
         });
     }
-    getCovorcs() {
+    addTitleFilter(title) {
+        if (title)
+            return `c.title ilike '%${title}%'`;
+        else
+            return "true";
+    }
+    getCovorcs(titleFilter) {
         const query = `
         select c.id, c.title, c."shortDescription", c."monWorkTime", c."tueWorkTime", c."wedWorkTime", c."thuWorkTime",
         c."friWorkTime", c."satWorkTime", c."sunWorkTime", c.address, max(cs.price) "maxPrice", min(cs.price) "minPrice",
@@ -135,6 +141,7 @@ let CovorcController = class CovorcController {
         from covorcs c
         join covorc_sections cs on c.id = cs."covorcId"
         left join covorc_section_pictures csp on csp."covorcSectionId" = cs.id
+        where ${this.addTitleFilter(titleFilter)}
         group by c.id
         `;
         return sequelize.query(query, { type: QueryTypes.SELECT });
@@ -160,7 +167,8 @@ __decorate([
     __param(0, Param('id'))
 ], CovorcController.prototype, "getOne", null);
 __decorate([
-    Get('/covorcs')
+    Get('/covorcs'),
+    __param(0, QueryParam("titleFilter"))
 ], CovorcController.prototype, "getAll", null);
 __decorate([
     Post('/covorcs'),

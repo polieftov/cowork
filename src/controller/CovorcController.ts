@@ -34,7 +34,7 @@ export class CovorcController {
     @Get('/covorcs')
     async getAll(@QueryParam("titleFilter") titleFilter: string) {
         logger.debug(`get all covorcs`);
-        return JSON.stringify(await this.getCovorcs(titleFilter));
+        return this.getCovorcs(titleFilter);
     }
 
     /**
@@ -150,7 +150,7 @@ export class CovorcController {
 
     addTitleFilter(title): string {
         if (title) return `c.title ilike '%${title}%'`
-        else return ""
+        else return "true"
     }
 
     getCovorcs(titleFilter: string): Promise<CovorcToGet[]> {
@@ -161,7 +161,7 @@ export class CovorcController {
         from covorcs c
         join covorc_sections cs on c.id = cs."covorcId"
         left join covorc_section_pictures csp on csp."covorcSectionId" = cs.id
-        ${this.addTitleFilter(titleFilter)}
+        where ${this.addTitleFilter(titleFilter)}
         group by c.id
         `
         return sequelize.query(query, {type: QueryTypes.SELECT})
