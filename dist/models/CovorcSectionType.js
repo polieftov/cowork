@@ -20,7 +20,7 @@ CovorcSectionType.init({
 });
 export function initCovorcSectionTypes() {
     return CovorcSectionType.findOrCreate({
-        where: { title: 'Openspace' }
+        where: { title: 'Open space' }
     }).then(() => {
         CovorcSectionType.findOrCreate({
             where: { title: 'Переговорная' }

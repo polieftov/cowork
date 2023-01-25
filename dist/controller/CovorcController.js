@@ -35,10 +35,18 @@ let CovorcController = class CovorcController {
             });
         });
     }
-    getAll(titleFilter) {
+    getAll(titleFilter, openSpace, meetingRoom, audience, minPrice, maxPrice, facilities //в формате [1,2,3]
+    ) {
         return __awaiter(this, void 0, void 0, function* () {
+            let covSecTypesFilter = [];
+            if (openSpace)
+                covSecTypesFilter.push(1);
+            if (meetingRoom)
+                covSecTypesFilter.push(2);
+            if (audience)
+                covSecTypesFilter.push(3);
             logger.debug(`get all covorcs`);
-            return this.getCovorcs(titleFilter);
+            return this.getCovorcs(titleFilter, covSecTypesFilter, minPrice, maxPrice, facilities);
         });
     }
     /**
@@ -133,7 +141,31 @@ let CovorcController = class CovorcController {
         else
             return "true";
     }
-    getCovorcs(titleFilter) {
+    addCovorcSectionTypesFilter(covSecTypesFilter) {
+        if (covSecTypesFilter.length > 0)
+            return `cs."sectionTypeId" in (${covSecTypesFilter.join()})`;
+        else
+            return "true";
+    }
+    addCovorcMinPriceFilter(minPrice) {
+        if (minPrice)
+            return `max(cs.price) > ${minPrice}`;
+        else
+            return "true";
+    }
+    addCovorcMaxPriceFilter(maxPrice) {
+        if (maxPrice)
+            return `min(cs.price) < ${maxPrice}`;
+        else
+            return "true";
+    }
+    addCovorcFacilitiesFilter(facilities) {
+        if (facilities)
+            return `array_agg(distinct csf.facilities) && array${facilities}`;
+        else
+            return "true";
+    }
+    getCovorcs(titleFilter, covSecTypesFilter, minPrice, maxPrice, facilities) {
         const query = `
         select c.id, c.title, c."shortDescription", c."monWorkTime", c."tueWorkTime", c."wedWorkTime", c."thuWorkTime",
         c."friWorkTime", c."satWorkTime", c."sunWorkTime", c.address, max(cs.price) "maxPrice", min(cs.price) "minPrice",
@@ -141,8 +173,11 @@ let CovorcController = class CovorcController {
         from covorcs c
         join covorc_sections cs on c.id = cs."covorcId"
         left join covorc_section_pictures csp on csp."covorcSectionId" = cs.id
-        where ${this.addTitleFilter(titleFilter)}
+        left join "CovorcSection2Facilities" csf on csf."covorcSection" = cs.id
+        where ${this.addTitleFilter(titleFilter)} and ${this.addCovorcSectionTypesFilter(covSecTypesFilter)}
         group by c.id
+        having ${this.addCovorcMinPriceFilter(minPrice)} and ${this.addCovorcMaxPriceFilter(maxPrice)} 
+        and ${this.addCovorcFacilitiesFilter(facilities)}
         `;
         return sequelize.query(query, { type: QueryTypes.SELECT });
     }
@@ -168,7 +203,13 @@ __decorate([
 ], CovorcController.prototype, "getOne", null);
 __decorate([
     Get('/covorcs'),
-    __param(0, QueryParam("titleFilter"))
+    __param(0, QueryParam("titleFilter")),
+    __param(1, QueryParam("openSpace")),
+    __param(2, QueryParam("meetingRoom")),
+    __param(3, QueryParam("audience")),
+    __param(4, QueryParam("minPrice")),
+    __param(5, QueryParam("maxPrice")),
+    __param(6, QueryParam("facilities"))
 ], CovorcController.prototype, "getAll", null);
 __decorate([
     Post('/covorcs'),

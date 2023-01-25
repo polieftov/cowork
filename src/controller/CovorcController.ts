@@ -32,9 +32,22 @@ export class CovorcController {
     }
 
     @Get('/covorcs')
-    async getAll(@QueryParam("titleFilter") titleFilter: string) {
+    async getAll(
+        @QueryParam("titleFilter") titleFilter: string,
+        @QueryParam("openSpace") openSpace: boolean,
+        @QueryParam("meetingRoom") meetingRoom: boolean,
+        @QueryParam("audience") audience: boolean,
+        @QueryParam("minPrice") minPrice: number,
+        @QueryParam("maxPrice") maxPrice: number,
+        @QueryParam("facilities") facilities: string //в формате [1,2,3]
+    ) {
+        let covSecTypesFilter = []
+        if (openSpace) covSecTypesFilter.push(1)
+        if (meetingRoom) covSecTypesFilter.push(2)
+        if (audience) covSecTypesFilter.push(3)
+
         logger.debug(`get all covorcs`);
-        return this.getCovorcs(titleFilter);
+        return this.getCovorcs(titleFilter, covSecTypesFilter, minPrice, maxPrice, facilities);
     }
 
     /**
@@ -153,7 +166,33 @@ export class CovorcController {
         else return "true"
     }
 
-    getCovorcs(titleFilter: string): Promise<CovorcToGet[]> {
+    addCovorcSectionTypesFilter(covSecTypesFilter: number[]): string {
+        if (covSecTypesFilter.length > 0) return `cs."sectionTypeId" in (${covSecTypesFilter.join()})`
+        else return "true"
+    }
+
+    addCovorcMinPriceFilter(minPrice: number): string {
+        if (minPrice) return `max(cs.price) > ${minPrice}`
+        else return "true"
+    }
+
+    addCovorcMaxPriceFilter(maxPrice: number): string {
+        if (maxPrice) return `min(cs.price) < ${maxPrice}`
+        else return "true"
+    }
+
+    addCovorcFacilitiesFilter(facilities: string): string {
+        if (facilities) return `array_agg(distinct csf.facilities) && array${facilities}`
+        else return "true"
+    }
+
+    getCovorcs(
+        titleFilter: string,
+        covSecTypesFilter: number[],
+        minPrice: number,
+        maxPrice: number,
+        facilities: string
+    ): Promise<CovorcToGet[]> {
         const query = `
         select c.id, c.title, c."shortDescription", c."monWorkTime", c."tueWorkTime", c."wedWorkTime", c."thuWorkTime",
         c."friWorkTime", c."satWorkTime", c."sunWorkTime", c.address, max(cs.price) "maxPrice", min(cs.price) "minPrice",
@@ -161,8 +200,11 @@ export class CovorcController {
         from covorcs c
         join covorc_sections cs on c.id = cs."covorcId"
         left join covorc_section_pictures csp on csp."covorcSectionId" = cs.id
-        where ${this.addTitleFilter(titleFilter)}
+        left join "CovorcSection2Facilities" csf on csf."covorcSection" = cs.id
+        where ${this.addTitleFilter(titleFilter)} and ${this.addCovorcSectionTypesFilter(covSecTypesFilter)}
         group by c.id
+        having ${this.addCovorcMinPriceFilter(minPrice)} and ${this.addCovorcMaxPriceFilter(maxPrice)} 
+        and ${this.addCovorcFacilitiesFilter(facilities)}
         `
         return sequelize.query(query, {type: QueryTypes.SELECT})
     }
