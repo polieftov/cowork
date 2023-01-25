@@ -148,6 +148,11 @@ export class CovorcController {
         logger.debug(`Covorc with id = ${id} was deleted`);
     }
 
+    addTitleFilter(title): string {
+        if (title) return `c.title ilike '%${title}%'`
+        else return ""
+    }
+
     getCovorcs(titleFilter: string): Promise<CovorcToGet[]> {
         const query = `
         select c.id, c.title, c."shortDescription", c."monWorkTime", c."tueWorkTime", c."wedWorkTime", c."thuWorkTime",
@@ -156,6 +161,7 @@ export class CovorcController {
         from covorcs c
         join covorc_sections cs on c.id = cs."covorcId"
         left join covorc_section_pictures csp on csp."covorcSectionId" = cs.id
+        ${this.addTitleFilter(titleFilter)}
         group by c.id
         `
         return sequelize.query(query, {type: QueryTypes.SELECT})
