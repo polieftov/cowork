@@ -148,7 +148,7 @@ export class CovorcController {
         logger.debug(`Covorc with id = ${id} was deleted`);
     }
 
-    getCovorcs(): Promise<CovorcToGet[]> {
+    getCovorcs(titleFilter: string): Promise<CovorcToGet[]> {
         const query = `
         select c.id, c.title, c."shortDescription", c."monWorkTime", c."tueWorkTime", c."wedWorkTime", c."thuWorkTime",
         c."friWorkTime", c."satWorkTime", c."sunWorkTime", c.address, max(cs.price) "maxPrice", min(cs.price) "minPrice",
