@@ -7,26 +7,18 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 var __param = (this && this.__param) || function (paramIndex, decorator) {
     return function (target, key) { decorator(target, key, paramIndex); }
 };
-import { Controller, Get, Param } from 'routing-controllers';
+import { Get, JsonController, Param, QueryParam } from 'routing-controllers';
 import 'reflect-metadata';
-import MultiGeocoder from 'multi-geocoder';
 let TestController = class TestController {
     getOne(id) {
         return 'This action returns test #' + id;
     }
-    getAll() {
-        const geocoder = new MultiGeocoder({ provider: 'yandex', coordorder: 'latlong' }), provider = geocoder.getProvider();
-        const getRequestParams = provider.getRequestParams;
-        provider.getRequestParams = function () {
-            const result = getRequestParams.apply(provider, arguments);
-            result.key = '7d804608-524d-4975-b71b-73e84da83c80';
-            return result;
+    getAll(fir, sec, th) {
+        return {
+            fir: fir,
+            sec: sec,
+            th: th
         };
-        return geocoder.geocode([{ address: 'Moscow' }, { address: 'New York' }, { address: 'Paris' }, { address: 'London' }])
-            .then(function (res) {
-            console.log(res);
-            return res;
-        });
     }
 };
 __decorate([
@@ -34,10 +26,13 @@ __decorate([
     __param(0, Param('id'))
 ], TestController.prototype, "getOne", null);
 __decorate([
-    Get('/tests')
+    Get('/tests'),
+    __param(0, QueryParam("fir")),
+    __param(1, QueryParam("sec")),
+    __param(2, QueryParam("th"))
 ], TestController.prototype, "getAll", null);
 TestController = __decorate([
-    Controller()
+    JsonController()
 ], TestController);
 export { TestController };
 //# sourceMappingURL=TestController.js.map

@@ -64,8 +64,10 @@ export class BookingController {
 
     @Get('/bookings')
     @HttpCode(200)
-    async getAll() {
+    async getAll(@QueryParam("userId") userId: number) {
         logger.debug(`get all bookings`);
+        if (userId)
+            return Booking.findAll({ where: {userId: userId}, include: [CovorcSection, User] });
         return JSON.stringify(await Booking.findAll({include: [CovorcSection, User]}));
     }
 

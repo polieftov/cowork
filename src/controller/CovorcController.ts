@@ -7,7 +7,7 @@ import {
     OnUndefined,
     Param,
     Post,
-    Put,
+    Put, QueryParam,
     UploadedFiles
 } from 'routing-controllers'
 import 'reflect-metadata'
@@ -32,9 +32,9 @@ export class CovorcController {
     }
 
     @Get('/covorcs')
-    async getAll() {
+    async getAll(@QueryParam("titleFilter") titleFilter: string) {
         logger.debug(`get all covorcs`);
-        return JSON.stringify(await this.getCovorcs());
+        return JSON.stringify(await this.getCovorcs(titleFilter));
     }
 
     /**

@@ -1,8 +1,9 @@
-import { Controller, Get, Param } from 'routing-controllers'
+import {Controller, Get, JsonController, Param, QueryParam} from 'routing-controllers'
 import 'reflect-metadata'
 import MultiGeocoder from 'multi-geocoder'
+import {logger} from "sequelize/types/utils/logger";
 
-@Controller()
+@JsonController()
 export class TestController {
     @Get('/tests/:id')
     getOne (@Param('id') id: number) {
@@ -10,24 +11,12 @@ export class TestController {
     }
 
     @Get('/tests')
-    getAll() {
-
-
-
-        const geocoder = new MultiGeocoder({provider: 'yandex', coordorder: 'latlong'}),
-            provider = geocoder.getProvider();
-
-        const getRequestParams = provider.getRequestParams;
-        provider.getRequestParams = function () {
-            const result = getRequestParams.apply(provider, arguments);
-            result.key = '7d804608-524d-4975-b71b-73e84da83c80';
-            return result;
-        };
-
-        return geocoder.geocode([{ address: 'Moscow' }, { address: 'New York' }, { address: 'Paris' }, { address: 'London' }])
-            .then(function (res) {
-                console.log(res);
-                return res
-            });
+    getAll(@QueryParam("fir") fir: number, @QueryParam("sec") sec: string, @QueryParam("th") th: number) {
+        logger.warn(fir + sec + th)
+        return {
+            fir: fir,
+            sec: sec,
+            th: th
+        }
     }
 }
