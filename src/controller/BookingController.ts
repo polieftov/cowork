@@ -62,13 +62,22 @@ export class BookingController {
         return res
     }
 
+    userIdFilter(userId) {
+        if (userId) return `bo."userId" = ${userId}`
+        else return "true"
+    }
+
     @Get('/bookings')
     @HttpCode(200)
     async getAll(@QueryParam("userId") userId: number) {
         logger.debug(`get all bookings`);
-        if (userId)
-            return Booking.findAll({ where: {userId: userId}, include: [CovorcSection, User] });
-        return JSON.stringify(await Booking.findAll({include: [CovorcSection, User]}));
+        const query = `
+         select bo.id, bo.price, bo."hours", bo."countOfPeople", bo.date, cs.description, cs.id "covorcSectionId" from bookings bo
+         join covorc_sections cs on cs.id = bo."covorcSectionId"
+         where ${this.userIdFilter(userId)}
+         order by date desc
+        `
+        return sequelize.query(query, {type: QueryTypes.SELECT})
     }
 
     /**
