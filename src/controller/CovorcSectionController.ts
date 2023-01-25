@@ -51,7 +51,7 @@ export class CovorcSectionController {
     async getOne(@Param('id') id: number) {
         let covorc: CovorcSection[] = await CovorcSection.findAll({
             where: {id: id},
-            include: [Covorc, Facilities, CovorcSectionType]
+            include: [Covorc, Facilities, CovorcSectionType, CovorcSectionsPictures]
         });
         logger.debug(`get covorc_sections ${covorc.map(c => c.id)}`);
         return JSON.stringify(covorc);
