@@ -72,9 +72,15 @@ export class BookingController {
     async getAll(@QueryParam("userId") userId: number) {
         logger.debug(`get all bookings`);
         const query = `
-         select bo.id, bo.price, bo."hours", bo."countOfPeople", bo.date, cs.description, cs.id "covorcSectionId" from bookings bo
+         select bo.id, bo.price, bo."hours", bo."countOfPeople", bo.date, bo."userId", 
+         max(cs.description) description, max(cs.id) "covorcSectionId", max(c.title) "covorcTitle",
+         max(c.address) address, max(c.id) "covorcId", array_agg(csp.filename) "covorcSectionPhotos"
+         from bookings bo
          join covorc_sections cs on cs.id = bo."covorcSectionId"
+         join covorcs c on c.id = cs."covorcId"
+         left join covorc_section_pictures csp on csp."covorcSectionId" = cs.id 
          where ${this.userIdFilter(userId)}
+         group by bo.id
          order by date desc
         `
         return sequelize.query(query, {type: QueryTypes.SELECT})
