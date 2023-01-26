@@ -15,7 +15,7 @@ import log4js from "log4js";
 import {Covorc} from "../models/Covorc.js";
 import {sequelize} from "../models/dbconnection.js";
 import {QueryTypes} from "sequelize";
-import MultiGeocoder from 'multi-geocoder'
+//import MultiGeocoder from 'multi-geocoder'
 import {Covorc2CovorcSection, CovorcSection, CovorcSection2Facilities} from "../models/CovorcSection.js";
 import multer from 'multer'
 import {CovorcSectionsPictures} from "../models/CovorcSectionsPictures.js";

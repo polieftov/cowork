@@ -1,6 +1,5 @@
 import {Controller, Get, JsonController, Param, QueryParam} from 'routing-controllers'
 import 'reflect-metadata'
-import MultiGeocoder from 'multi-geocoder'
 import log4js from "log4js";
 const logger = log4js.getLogger()
 
